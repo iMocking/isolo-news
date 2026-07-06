@@ -8,11 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 .vscode
 .trae
-node_modules
-dist
-dist-ssr
+*/node_modules
+*/dist
+*/dist-ssr
 *.local
-package-lock.json
+*/package-lock.json
+*/go.sum
+*/*.exe
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
