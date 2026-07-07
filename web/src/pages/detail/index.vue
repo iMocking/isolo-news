@@ -160,8 +160,8 @@ import { useUserStore } from '@/stores/userStore'
 import { fetchArticleById, recordRead } from '@/api/articles'
 import { Eye, ArrowLeft } from 'lucide-vue-next'
 import { useReadTracker } from '@/composables/useReadTracker'
-import ArticleComments from '@/components/business/ArticleComments.vue'
-import ArticleSidebar from '@/components/business/ArticleSidebar.vue'
+import ArticleComments from './ArticleComments.vue'
+import ArticleSidebar from './ArticleSidebar.vue'
 
 const route = useRoute()
 const themeStore = useThemeStore()

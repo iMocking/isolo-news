@@ -6,7 +6,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('@/pages/HomePage.vue')
+    component: () => import('@/pages/home/index.vue')
   },
   // ==================== 文章路由（嵌套布局） ====================
   {
@@ -20,12 +20,12 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'list',
         name: 'ArticleList',
-        component: () => import('@/pages/ArticleListPage.vue')
+        component: () => import('@/pages/list/index.vue')
       },
       {
         path: 'detail/:id',
         name: 'ArticleDetail',
-        component: () => import('@/pages/ArticleDetailPage.vue')
+        component: () => import('@/pages/detail/index.vue')
       }
     ]
   },
@@ -42,12 +42,12 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'login',
         name: 'Login',
-        component: () => import('@/pages/LoginPage.vue')
+        component: () => import('@/pages/login/index.vue')
       },
       {
         path: 'register',
         name: 'Register',
-        component: () => import('@/pages/RegisterPage.vue')
+        component: () => import('@/pages/register/index.vue')
       }
     ]
   },
@@ -56,29 +56,29 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/search',
     name: 'SearchResults',
-    component: () => import('@/pages/SearchResultsPage.vue')
+    component: () => import('@/pages/search/index.vue')
   },
   {
     path: '/profile',
     name: 'UserProfile',
     meta: { requiresAuth: true },
-    component: () => import('@/pages/UserProfilePage.vue')
+    component: () => import('@/pages/profile/index.vue')
   },
   {
     path: '/about',
     name: 'About',
-    component: () => import('@/pages/AboutPage.vue')
+    component: () => import('@/pages/about/index.vue')
   },
   {
     path: '/settings',
     name: 'Settings',
     meta: { requiresAuth: true },
-    component: () => import('@/pages/SettingsPage.vue')
+    component: () => import('@/pages/settings/index.vue')
   },
   {
     path: '/404',
     name: 'NotFound',
-    component: () => import('@/pages/NotFoundPage.vue')
+    component: () => import('@/pages/404.vue')
   },
   {
     path: '/:pathMatch(.*)*',

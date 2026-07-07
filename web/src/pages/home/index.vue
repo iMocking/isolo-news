@@ -34,11 +34,11 @@ import { useUserStore } from '@/stores/userStore'
 import { useArticleStore } from '@/stores/articleStore'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
-import HeroSection from '@/components/business/HeroSection.vue'
-import TrendingTopics from '@/components/business/TrendingTopics.vue'
+import HeroSection from './HeroSection.vue'
+import TrendingTopics from './TrendingTopics.vue'
 import ArticleGrid from '@/components/business/ArticleGrid.vue'
-import PlayerStats from '@/components/business/PlayerStats.vue'
-import DailyQuests from '@/components/business/DailyQuests.vue'
+import PlayerStats from './PlayerStats.vue'
+import DailyQuests from './DailyQuests.vue'
 
 const userStore = useUserStore()
 const articleStore = useArticleStore()

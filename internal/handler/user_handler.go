@@ -6,7 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"isolo-news/internal/middleware"
 	"isolo-news/internal/service"
-	"isolo-news/pkg/response"
+	"isolo-news/internal/errcode"
+	"isolo-news/internal/response"
 )
 
 // UserHandler 用户处理器
@@ -24,7 +25,7 @@ func NewUserHandler(svc *service.UserService) *UserHandler {
 func (h *UserHandler) GetProfile(c *gin.Context) {
 	userID, _ := c.Get(middleware.CtxKeyUserID)
 	if userID == "" {
-		response.Error(c, 401, response.CodeTokenInvalid)
+		response.Error(c, 401, errcode.CodeTokenInvalid)
 		return
 	}
 
@@ -34,7 +35,7 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 		return
 	}
 	if user == nil {
-		response.Error(c, 404, response.CodeUserNotFound)
+		response.Error(c, 404, errcode.CodeUserNotFound)
 		return
 	}
 
@@ -46,7 +47,7 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	userID, _ := c.Get(middleware.CtxKeyUserID)
 	if userID == "" {
-		response.Error(c, 401, response.CodeTokenInvalid)
+		response.Error(c, 401, errcode.CodeTokenInvalid)
 		return
 	}
 
@@ -70,7 +71,7 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 func (h *UserHandler) GetFavorites(c *gin.Context) {
 	userID, _ := c.Get(middleware.CtxKeyUserID)
 	if userID == "" {
-		response.Error(c, 401, response.CodeTokenInvalid)
+		response.Error(c, 401, errcode.CodeTokenInvalid)
 		return
 	}
 
@@ -88,7 +89,7 @@ func (h *UserHandler) GetFavorites(c *gin.Context) {
 func (h *UserHandler) GetAchievements(c *gin.Context) {
 	userID, _ := c.Get(middleware.CtxKeyUserID)
 	if userID == "" {
-		response.Error(c, 401, response.CodeTokenInvalid)
+		response.Error(c, 401, errcode.CodeTokenInvalid)
 		return
 	}
 
@@ -106,7 +107,7 @@ func (h *UserHandler) GetAchievements(c *gin.Context) {
 func (h *UserHandler) GetQuests(c *gin.Context) {
 	userID, _ := c.Get(middleware.CtxKeyUserID)
 	if userID == "" {
-		response.Error(c, 401, response.CodeTokenInvalid)
+		response.Error(c, 401, errcode.CodeTokenInvalid)
 		return
 	}
 
@@ -124,7 +125,7 @@ func (h *UserHandler) GetQuests(c *gin.Context) {
 func (h *UserHandler) GetStats(c *gin.Context) {
 	userID, _ := c.Get(middleware.CtxKeyUserID)
 	if userID == "" {
-		response.Error(c, 401, response.CodeTokenInvalid)
+		response.Error(c, 401, errcode.CodeTokenInvalid)
 		return
 	}
 

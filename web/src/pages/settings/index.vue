@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Bell, Palette, EyeOff, Shield } from 'lucide-vue-next'
 import NotificationToggles from '@/components/business/NotificationToggles.vue'
-import ProfileEditCard from '@/components/profile/ProfileEditCard.vue'
-import SystemInfoCard from '@/components/profile/SystemInfoCard.vue'
+import ProfileEditCard from '@/pages/profile/EditCard.vue'
+import SystemInfoCard from '@/pages/profile/SystemInfoCard.vue'
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseCard from '@/components/base/BaseCard.vue'

@@ -15,8 +15,8 @@ import (
 	"isolo-news/internal/dto"
 	"isolo-news/internal/ent"
 	"isolo-news/internal/ent/user"
-	"isolo-news/pkg/jwt"
-	"isolo-news/pkg/password"
+	"isolo-news/internal/jwt"
+	"isolo-news/internal/password"
 )
 
 // AuthService 认证服务

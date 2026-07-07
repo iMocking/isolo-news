@@ -6,7 +6,7 @@ import { ref, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/userStore'
-import RegisterForm from '@/components/business/RegisterForm.vue'
+import RegisterForm from './RegisterForm.vue'
 import type { LoginThemeConfig } from '@/components/business/loginThemeConfig'
 
 const { t } = useI18n()

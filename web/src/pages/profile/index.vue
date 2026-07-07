@@ -7,10 +7,10 @@ import { useArticleStore } from '@/stores/articleStore'
 import BaseProgressBar from '@/components/base/BaseProgressBar.vue'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
-import ProfileHeroSection from '@/components/profile/ProfileHeroSection.vue'
-import StatsPanel from '@/components/profile/StatsPanel.vue'
-import AchievementGrid from '@/components/profile/AchievementGrid.vue'
-import FavoriteArticleList from '@/components/profile/FavoriteArticleList.vue'
+import HeroSection from './HeroSection.vue'
+import StatsPanel from './StatsPanel.vue'
+import AchievementGrid from './AchievementGrid.vue'
+import FavoriteList from './FavoriteList.vue'
 
 import { fetchFavorites } from '@/api/user'
 import { useCardStyles } from '@/hooks/useCardStyles'
@@ -89,7 +89,7 @@ const handleLogout = () => {
 
     <main class="pt-16">
       <!-- 用户头像与信息 -->
-      <ProfileHeroSection />
+      <HeroSection />
 
       <!-- 等级 / XP 进度条 -->
       <section class="max-w-5xl mx-auto px-6 -mt-4 relative z-20">
@@ -116,7 +116,7 @@ const handleLogout = () => {
       <AchievementGrid :achievements="achievementList" />
 
       <!-- 我的收藏 -->
-      <FavoriteArticleList :articles="favoriteArticleList" />
+      <FavoriteList :articles="favoriteArticleList" />
 
       <!-- 退出登录 -->
       <section class="max-w-5xl mx-auto px-6 pb-16">

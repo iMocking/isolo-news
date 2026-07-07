@@ -6,7 +6,7 @@ import { ref, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/userStore'
-import LoginForm from '@/components/business/LoginForm.vue'
+import LoginForm from './LoginForm.vue'
 import type { LoginThemeConfig } from '@/components/business/loginThemeConfig'
 
 const { t } = useI18n()

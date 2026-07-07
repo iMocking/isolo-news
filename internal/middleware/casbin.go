@@ -7,7 +7,8 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
-	"isolo-news/pkg/response"
+	"isolo-news/internal/errcode"
+	"isolo-news/internal/response"
 )
 
 // CasbinAuth Casbin 权限验证中间件
@@ -26,13 +27,13 @@ func CasbinAuth(enforcer *casbin.Enforcer) gin.HandlerFunc {
 		// 执行权限检查
 		allowed, err := enforcer.Enforce(role.(string), obj, act)
 		if err != nil {
-			response.Error(c, http.StatusInternalServerError, response.CodeInternalError)
+			response.Error(c, http.StatusInternalServerError, errcode.CodeInternalError)
 			c.Abort()
 			return
 		}
 
 		if !allowed {
-			response.Error(c, http.StatusForbidden, response.CodePermissionDenied)
+			response.Error(c, http.StatusForbidden, errcode.CodePermissionDenied)
 			c.Abort()
 			return
 		}

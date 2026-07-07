@@ -7,7 +7,8 @@ import (
 	"isolo-news/internal/dto"
 	"isolo-news/internal/ent"
 	"isolo-news/internal/ent/article"
-	"isolo-news/pkg/response"
+	"isolo-news/internal/errcode"
+	"isolo-news/internal/response"
 )
 
 // CategoryHandler 分类处理器
@@ -31,7 +32,7 @@ func (h *CategoryHandler) GetCategories(c *gin.Context) {
 		Order(ent.Asc("sort_order")).
 		All(ctx)
 	if err != nil {
-		response.Error(c, 500, response.CodeInternalError)
+		response.Error(c, 500, errcode.CodeInternalError)
 		return
 	}
 

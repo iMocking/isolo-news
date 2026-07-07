@@ -5,8 +5,9 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"isolo-news/internal/dto"
+	"isolo-news/internal/errcode"
 	"isolo-news/internal/service"
-	"isolo-news/pkg/response"
+	"isolo-news/internal/response"
 )
 
 // AuthHandler 认证处理器
@@ -30,11 +31,11 @@ func (h *AuthHandler) Register(c *gin.Context) {
 
 	user, err := h.svc.Register(c.Request.Context(), &req)
 	if err != nil {
-		response.ErrorWithMsg(c, 400, response.CodeEmailRegistered, err.Error())
+		response.ErrorWithMsg(c, 400, errcode.CodeEmailRegistered, err.Error())
 		return
 	}
 
-	c.JSON(201, response.NewResponse(response.CodeSuccess, user))
+	c.JSON(201, response.NewResponse(errcode.CodeSuccess, user))
 }
 
 // Login 用户登录
@@ -50,13 +51,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	if err != nil {
 		msg := err.Error()
 		if msg == "用户不存在" {
-			response.ErrorWithMsg(c, 401, response.CodeUserNotFound, msg)
+			response.ErrorWithMsg(c, 401, errcode.CodeUserNotFound, msg)
 		} else if msg == "密码错误" {
-			response.ErrorWithMsg(c, 401, response.CodePasswordWrong, msg)
+			response.ErrorWithMsg(c, 401, errcode.CodePasswordWrong, msg)
 		} else if msg == "邮箱未验证" {
-			response.ErrorWithMsg(c, 401, response.CodeAccountNotActive, msg)
+			response.ErrorWithMsg(c, 401, errcode.CodeAccountNotActive, msg)
 		} else {
-			response.ErrorWithMsg(c, 401, response.CodeInternalError, msg)
+			response.ErrorWithMsg(c, 401, errcode.CodeInternalError, msg)
 		}
 		return
 	}
@@ -74,7 +75,7 @@ func (h *AuthHandler) SendVerifyCode(c *gin.Context) {
 	}
 
 	if err := h.svc.SendVerifyCode(c.Request.Context(), req.Email); err != nil {
-		response.ErrorWithMsg(c, 500, response.CodeInternalError, err.Error())
+		response.ErrorWithMsg(c, 500, errcode.CodeInternalError, err.Error())
 		return
 	}
 
@@ -92,11 +93,11 @@ func (h *AuthHandler) VerifyEmail(c *gin.Context) {
 
 	ok, err := h.svc.VerifyCode(c.Request.Context(), req.Email, req.Code)
 	if err != nil {
-		response.ErrorWithMsg(c, 400, response.CodeVerifyCodeWrong, err.Error())
+		response.ErrorWithMsg(c, 400, errcode.CodeVerifyCodeWrong, err.Error())
 		return
 	}
 	if !ok {
-		response.Error(c, 400, response.CodeVerifyCodeWrong)
+		response.Error(c, 400, errcode.CodeVerifyCodeWrong)
 		return
 	}
 

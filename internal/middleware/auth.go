@@ -7,8 +7,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"isolo-news/pkg/jwt"
-	"isolo-news/pkg/response"
+	"isolo-news/internal/errcode"
+	"isolo-news/internal/jwt"
+	"isolo-news/internal/response"
 )
 
 // 上下文键名
@@ -23,14 +24,14 @@ func AuthRequired(jwtSecret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := extractToken(c)
 		if tokenString == "" {
-			response.Error(c, http.StatusUnauthorized, response.CodeTokenInvalid)
+			response.Error(c, http.StatusUnauthorized, errcode.CodeTokenInvalid)
 			c.Abort()
 			return
 		}
 
 		claims, err := jwt.ParseToken(jwtSecret, tokenString)
 		if err != nil {
-			response.Error(c, http.StatusUnauthorized, response.CodeTokenExpired)
+			response.Error(c, http.StatusUnauthorized, errcode.CodeTokenExpired)
 			c.Abort()
 			return
 		}

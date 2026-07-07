@@ -10,7 +10,8 @@ import (
 	"isolo-news/internal/middleware"
 	"isolo-news/internal/dto"
 	"isolo-news/internal/service"
-	"isolo-news/pkg/response"
+	"isolo-news/internal/errcode"
+	"isolo-news/internal/response"
 )
 
 // ArticleHandler 资讯处理器
@@ -81,7 +82,7 @@ func (h *ArticleHandler) GetByID(c *gin.Context) {
 		return
 	}
 	if article == nil {
-		response.Error(c, http.StatusNotFound, response.CodeArticleNotFound)
+		response.Error(c, http.StatusNotFound, errcode.CodeArticleNotFound)
 		return
 	}
 
@@ -117,7 +118,7 @@ func (h *ArticleHandler) CreateComment(c *gin.Context) {
 
 	userID, _ := c.Get(middleware.CtxKeyUserID)
 	if userID == "" {
-		response.Error(c, http.StatusUnauthorized, response.CodeTokenInvalid)
+		response.Error(c, http.StatusUnauthorized, errcode.CodeTokenInvalid)
 		return
 	}
 
@@ -142,7 +143,7 @@ func (h *ArticleHandler) CreateComment(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.NewResponse(response.CodeSuccess, comment))
+	c.JSON(http.StatusCreated, response.NewResponse(errcode.CodeSuccess, comment))
 }
 
 // ToggleLike 切换点赞
@@ -174,7 +175,7 @@ func (h *ArticleHandler) ToggleFavorite(c *gin.Context) {
 
 	userID, _ := c.Get(middleware.CtxKeyUserID)
 	if userID == "" {
-		response.Error(c, http.StatusUnauthorized, response.CodeTokenInvalid)
+		response.Error(c, http.StatusUnauthorized, errcode.CodeTokenInvalid)
 		return
 	}
 
@@ -198,7 +199,7 @@ func (h *ArticleHandler) RecordRead(c *gin.Context) {
 
 	userID, _ := c.Get(middleware.CtxKeyUserID)
 	if userID == "" {
-		response.Error(c, http.StatusUnauthorized, response.CodeTokenInvalid)
+		response.Error(c, http.StatusUnauthorized, errcode.CodeTokenInvalid)
 		return
 	}
 
