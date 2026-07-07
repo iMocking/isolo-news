@@ -99,6 +99,20 @@ func (_c *CategoryCreate) SetNillableSortOrder(v *int) *CategoryCreate {
 	return _c
 }
 
+// SetTotal sets the "total" field.
+func (_c *CategoryCreate) SetTotal(v int) *CategoryCreate {
+	_c.mutation.SetTotal(v)
+	return _c
+}
+
+// SetNillableTotal sets the "total" field if the given value is not nil.
+func (_c *CategoryCreate) SetNillableTotal(v *int) *CategoryCreate {
+	if v != nil {
+		_c.SetTotal(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *CategoryCreate) SetID(v string) *CategoryCreate {
 	_c.mutation.SetID(v)
@@ -160,6 +174,10 @@ func (_c *CategoryCreate) defaults() {
 		v := category.DefaultSortOrder
 		_c.mutation.SetSortOrder(v)
 	}
+	if _, ok := _c.mutation.Total(); !ok {
+		v := category.DefaultTotal
+		_c.mutation.SetTotal(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := category.DefaultID()
 		_c.mutation.SetID(v)
@@ -208,6 +226,9 @@ func (_c *CategoryCreate) check() error {
 	}
 	if _, ok := _c.mutation.SortOrder(); !ok {
 		return &ValidationError{Name: "sort_order", err: errors.New(`ent: missing required field "Category.sort_order"`)}
+	}
+	if _, ok := _c.mutation.Total(); !ok {
+		return &ValidationError{Name: "total", err: errors.New(`ent: missing required field "Category.total"`)}
 	}
 	return nil
 }
@@ -275,6 +296,10 @@ func (_c *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.SortOrder(); ok {
 		_spec.SetField(category.FieldSortOrder, field.TypeInt, value)
 		_node.SortOrder = value
+	}
+	if value, ok := _c.mutation.Total(); ok {
+		_spec.SetField(category.FieldTotal, field.TypeInt, value)
+		_node.Total = value
 	}
 	return _node, _spec
 }

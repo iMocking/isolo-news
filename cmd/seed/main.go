@@ -57,6 +57,9 @@ func main() {
 	// 兼容旧数据库：激活所有未激活的数据源
 	seeder.ActivateSources(ctx, db)
 
+	// 兼容已有安装：自动补充中文等新增数据源
+	seeder.AddMissingSources(ctx, db)
+
 	// 初始化采集器并立即执行一次全量采集
 	col := collector.NewCollector(db, &cfg.Collector)
 	log.Println("开始从 RSS 数据源采集数据（可能需要一些时间）...")

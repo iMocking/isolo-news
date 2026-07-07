@@ -28,4 +28,5 @@ export interface Quest {
   status: 'not_started' | 'in_progress' | 'completed'
   icon?: any
   statusText?: string
+  questType?: string
 }

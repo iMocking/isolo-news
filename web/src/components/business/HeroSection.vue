@@ -54,6 +54,7 @@
           :style="primaryButtonStyle"
           @mouseenter="handlePrimaryHover"
           @mouseleave="handlePrimaryLeave"
+          @click="goToTechList"
         >
           <component :is="primaryIcon" class="w-4 h-4" />
           {{ primaryButtonText }}
@@ -63,6 +64,7 @@
           :style="secondaryButtonStyle"
           @mouseenter="handleSecondaryHover"
           @mouseleave="handleSecondaryLeave"
+          @click="goToAnimeList"
         >
           <component :is="secondaryIcon" class="w-4 h-4" />
           {{ secondaryButtonText }}
@@ -74,10 +76,12 @@
 
 <script setup lang="ts">
 import { computed, ref, type StyleValue } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '@/stores/themeStore'
 import { Compass, ScrollText, Radar, FileText } from 'lucide-vue-next'
 
+const router = useRouter()
 const { t } = useI18n()
 const themeStore = useThemeStore()
 
@@ -225,5 +229,15 @@ const handleSecondaryHover = () => {
 
 const handleSecondaryLeave = () => {
   isSecondaryHovered.value = false
+}
+
+/** 按钮一：跳转到文章列表页，筛选科技分类 */
+const goToTechList = () => {
+  router.push({ path: '/article/list', query: { category: 'tech' } })
+}
+
+/** 按钮二：跳转到文章列表页，筛选二次元分类 */
+const goToAnimeList = () => {
+  router.push({ path: '/article/list', query: { category: 'anime' } })
 }
 </script>

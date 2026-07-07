@@ -3,6 +3,17 @@
  * 按功能域组织，仅包含界面文字
  */
 export default {
+  // ==================== 分类名称（全局统一使用 slug 作为 key） ====================
+  categories: {
+    all: '全部',
+    tech: '科技',
+    ai_robot: 'AI机器人',
+    ai_coding: 'AI编程',
+    hardware: '硬件',
+    anime: '二次元',
+    godot: 'Godot',
+  },
+
   // ==================== 通用 ====================
   common: {
     all: '全部',
@@ -47,7 +58,8 @@ export default {
     aboutMe: '关于我',
     profile: '个人中心',
     settings: '偏好设置',
-    logout: '退出账号'
+    logout: '退出账号',
+    switchTheme: '切换主题'
   },
 
   // ==================== 首页 Hero ====================
@@ -124,7 +136,12 @@ export default {
       },
       statusCompleted: '已完成',
       statusNotStarted: '未开始',
-      progress: '进度 {progress}/{target}'
+      progress: '进度 {progress}/{target}',
+      questTitles: {
+        read_articles: '阅读3篇资讯',
+        login: '完成每日签到',
+        comment: '评论一篇评测'
+      }
     },
     grid: {
       title: {

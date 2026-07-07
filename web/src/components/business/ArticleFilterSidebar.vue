@@ -1,33 +1,33 @@
 <template>
-  <aside class="hidden lg:block w-72 shrink-0 space-y-6">
+  <aside class="hidden lg:block w-72 shrink-0 space-y-6 sticky top-24 self-start">
     <!-- Filter Panel -->
     <div class="p-5" :style="sidebarPanelStyle">
-      <h3 class="text-sm font-semibold mb-4" style="font-family: var(--font-display); color: var(--color-primary);">筛选条件</h3>
+      <h3 class="text-sm font-semibold mb-4" style="font-family: var(--font-display); color: var(--color-primary);">{{ t('articleList.filter.title') }}</h3>
       <div class="space-y-3">
         <div>
-          <label class="block text-xs mb-1.5" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">时间范围</label>
+          <label class="block text-xs mb-1.5" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">{{ t('articleList.filter.timeRange') }}</label>
           <select class="w-full px-3 h-9 text-sm outline-none" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-subtle); color: var(--color-text-secondary); border-radius: var(--radius-sm); font-family: var(--font-mono);">
-            <option>全部时间</option>
-            <option>24小时内</option>
-            <option>一周内</option>
-            <option>一个月内</option>
+            <option>{{ t('articleList.filter.allTime') }}</option>
+            <option>{{ t('articleList.filter.within24h') }}</option>
+            <option>{{ t('articleList.filter.withinWeek') }}</option>
+            <option>{{ t('articleList.filter.withinMonth') }}</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs mb-1.5" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">热度排序</label>
+          <label class="block text-xs mb-1.5" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">{{ t('articleList.filter.sortBy') }}</label>
           <select class="w-full px-3 h-9 text-sm outline-none" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-subtle); color: var(--color-text-secondary); border-radius: var(--radius-sm); font-family: var(--font-mono);">
-            <option>最新发布</option>
-            <option>最多评论</option>
-            <option>最高热度</option>
+            <option>{{ t('articleList.filter.latest') }}</option>
+            <option>{{ t('articleList.filter.mostComments') }}</option>
+            <option>{{ t('articleList.filter.hottest') }}</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs mb-1.5" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">来源</label>
+          <label class="block text-xs mb-1.5" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">{{ t('articleList.filter.source') }}</label>
           <select class="w-full px-3 h-9 text-sm outline-none" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border-subtle); color: var(--color-text-secondary); border-radius: var(--radius-sm); font-family: var(--font-mono);">
-            <option>全部来源</option>
-            <option>官方渠道</option>
-            <option>社区投稿</option>
-            <option>行业媒体</option>
+            <option>{{ t('articleList.filter.allSources') }}</option>
+            <option>{{ t('articleList.filter.official') }}</option>
+            <option>{{ t('articleList.filter.community') }}</option>
+            <option>{{ t('articleList.filter.industry') }}</option>
           </select>
         </div>
       </div>
@@ -35,7 +35,7 @@
 
     <!-- Hot Tags -->
     <div class="p-5" :style="sidebarPanelStyle">
-      <h3 class="text-sm font-semibold mb-4" style="font-family: var(--font-display); color: var(--color-primary);">热门标签</h3>
+      <h3 class="text-sm font-semibold mb-4" style="font-family: var(--font-display); color: var(--color-primary);">{{ t('articleList.sidebar.hotTags') }}</h3>
       <div class="flex flex-wrap gap-2">
         <span v-for="tag in hotTags" :key="tag.name" class="px-2.5 py-1 text-xs whitespace-nowrap transition-all duration-150" :style="{
           background: tag.bg,
@@ -49,7 +49,7 @@
 
     <!-- Weekly Leaderboard -->
     <div class="p-5" :style="sidebarPanelStyle">
-      <h3 class="text-sm font-semibold mb-4" style="font-family: var(--font-display); color: var(--color-primary);">本周排行</h3>
+      <h3 class="text-sm font-semibold mb-4" style="font-family: var(--font-display); color: var(--color-primary);">{{ t('articleList.sidebar.weeklyRank') }}</h3>
       <div class="space-y-3">
         <div v-for="(item, index) in leaderboard" :key="index" class="flex items-center gap-3 group cursor-pointer">
           <span class="w-5 h-5 flex items-center justify-center text-[10px] font-bold shrink-0" :style="{
@@ -68,7 +68,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useCardStyles } from '@/hooks/useCardStyles'
+
+const { t } = useI18n()
 
 defineProps<{
   categories: Array<{ id: string; name: string; count: number }>

@@ -55,7 +55,7 @@ interface StatItem {
 const stats = computed<StatItem[]>(() => [
   { icon: BookOpen, label: t('profile.stats.0'), value: userStore.readArticles, color: 'primary' },
   { icon: Trophy, label: t('profile.stats.1'), value: userStore.achievementCount, color: 'secondary' },
-  { icon: Flame, label: t('profile.stats.2'), value: `${userStore.loginDays}天`, color: 'primary' },
+  { icon: Flame, label: t('profile.stats.2'), value: `${userStore.loginDays}${t('profile.unitDays')}`, color: 'primary' },
   { icon: BarChart3, label: t('profile.stats.3'), value: `#${userStore.rank}`, color: 'primary' },
   { icon: MessageSquare, label: t('profile.stats.4'), value: userStore.achievementCount, color: 'secondary' },
   { icon: Bookmark, label: t('profile.stats.5'), value: userStore.favoriteArticles.length, color: 'primary' }

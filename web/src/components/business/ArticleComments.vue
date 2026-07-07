@@ -2,9 +2,9 @@
   <div class="mt-12">
     <div class="flex items-center gap-3 mb-6">
       <span class="w-1 h-5 rounded-sm" style="background: var(--color-primary);"></span>
-      <h3 class="text-lg font-semibold" style="color: var(--color-text-primary); font-family: var(--font-display);">
-        评论区 <span class="text-sm font-normal" style="color: var(--color-text-tertiary);">({{ comments.length }})</span>
-      </h3>
+       <h3 class="text-lg font-semibold" style="color: var(--color-text-primary); font-family: var(--font-display);">
+         {{ t('articleDetail.comment.title', { count: comments.length }) }}
+       </h3>
     </div>
 
     <!-- Comment Input -->
@@ -26,7 +26,7 @@
             v-model="newComment"
             class="w-full p-3 text-sm outline-none resize-none transition-all duration-150"
             style="background: var(--color-bg-primary); border: 1px solid var(--color-border); border-radius: var(--radius-sm); color: var(--color-text-primary); font-family: var(--font-body); min-height: 80px;"
-            placeholder="写下你的评论..."
+            :placeholder="t('articleDetail.comment.placeholder')"
           ></textarea>
           <div class="flex justify-end mt-3">
             <button
@@ -41,7 +41,7 @@
               @click="handleAddComment"
             >
               <Send class="w-4 h-4" />
-              <span>发表评论</span>
+              <span>{{ t('articleDetail.comment.submit') }}</span>
             </button>
           </div>
         </div>
@@ -72,7 +72,7 @@
                 <span>{{ comment.likes }}</span>
               </button>
               <button class="text-xs transition-colors duration-150" style="color: var(--color-text-tertiary);" @mouseenter="($event.target as HTMLElement).style.color = 'var(--color-primary)'" @mouseleave="($event.target as HTMLElement).style.color = 'var(--color-text-tertiary)'">
-                回复
+                {{ t('articleDetail.comment.reply') }}
               </button>
             </div>
           </div>

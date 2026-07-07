@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { useUserStore } from '@/stores/userStore'
 import { useArticleStore } from '@/stores/articleStore'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
@@ -39,12 +40,15 @@ import ArticleGrid from '@/components/business/ArticleGrid.vue'
 import PlayerStats from '@/components/business/PlayerStats.vue'
 import DailyQuests from '@/components/business/DailyQuests.vue'
 
+const userStore = useUserStore()
 const articleStore = useArticleStore()
 
 const articles = computed(() => articleStore.articles)
 
 /** 首页挂载时加载数据 */
 onMounted(async () => {
+  // 刷新用户数据（等级/经验/任务进度等）
+  await userStore.refreshUserData()
   // 加载文章列表（如果尚未加载）
   if (articleStore.articles.length === 0) {
     await articleStore.loadArticles()

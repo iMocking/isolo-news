@@ -99,6 +99,11 @@ func (s *Scheduler) collectByCategory(categoryID string) {
 			log.Printf("[调度器] 采集 [%s] 完成: %d 篇新文章", src.Name, count)
 		}
 	}
+
+	// 采集完成后更新分类总数
+	if err := s.collector.UpdateCategoryTotals(ctx); err != nil {
+		log.Printf("[调度器] 更新分类总数失败: %v", err)
+	}
 }
 
 // RunNow 立即执行所有活跃数据源的一次性采集

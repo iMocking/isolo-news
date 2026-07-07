@@ -133,6 +133,10 @@ func (s *GameService) updateQuestProgress(ctx context.Context, userID, questType
 					AddXp(q.XpReward).
 					Save(ctx)
 				log.Printf("[Game] 鉁?鐢ㄦ埛浠诲姟瀹屾垚: %s, 濂栧姳 %d XP", q.Title, q.XpReward)
+				// 鍙戞斁 XP 鍚庢鏌ユ槸鍚﹀崌绾?
+				if _, _, err := s.CheckAndUpgrade(ctx, userID); err != nil {
+					log.Printf("[Game] 浠诲姟瀹屾垚鍚庢鏌ュ崌绾уけ璐? %v", err)
+				}
 			}
 
 			_, err = s.db.UserQuest.Update().
@@ -153,6 +157,10 @@ func (s *GameService) updateQuestProgress(ctx context.Context, userID, questType
 					AddXp(q.XpReward).
 					Save(ctx)
 				log.Printf("[Game] 鉁?鐢ㄦ埛浠诲姟瀹屾垚: %s, 濂栧姳 %d XP", q.Title, q.XpReward)
+				// 鍙戞斁 XP 鍚庢鏌ユ槸鍚﹀崌绾?
+				if _, _, err := s.CheckAndUpgrade(ctx, userID); err != nil {
+					log.Printf("[Game] 浠诲姟瀹屾垚鍚庢鏌ュ崌绾уけ璐? %v", err)
+				}
 			}
 
 			_, err = s.db.UserQuest.Create().

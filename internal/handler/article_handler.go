@@ -15,12 +15,13 @@ import (
 
 // ArticleHandler 资讯处理器
 type ArticleHandler struct {
-	svc *service.ArticleService
+	svc     *service.ArticleService
+	gameSvc *service.GameService
 }
 
 // NewArticleHandler 创建资讯处理器
-func NewArticleHandler(svc *service.ArticleService) *ArticleHandler {
-	return &ArticleHandler{svc: svc}
+func NewArticleHandler(svc *service.ArticleService, gameSvc *service.GameService) *ArticleHandler {
+	return &ArticleHandler{svc: svc, gameSvc: gameSvc}
 }
 
 // List 获取资讯列表
@@ -201,13 +202,17 @@ func (h *ArticleHandler) RecordRead(c *gin.Context) {
 		return
 	}
 
-	xpGained, err := h.svc.RecordRead(c.Request.Context(), userID.(string), articleID)
+	xpGained, leveledUp, newLevel, err := h.gameSvc.ProcessReadReward(c.Request.Context(), userID.(string), articleID)
 	if err != nil {
 		response.InternalError(c)
 		return
 	}
 
-	response.Success(c, gin.H{"xpGained": xpGained})
+	response.Success(c, gin.H{
+		"xpGained":  xpGained,
+		"leveledUp": leveledUp,
+		"newLevel":  newLevel,
+	})
 }
 
 // GetTrendingTopics 获取热门话题

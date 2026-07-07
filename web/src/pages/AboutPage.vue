@@ -26,32 +26,21 @@ onMounted(() => {
 
 const theme = computed(() => themeStore.currentTheme)
 
-const pageTitle = computed(() => {
-  const titles: Record<string, string> = {
-    nexus: 'ABOUT NEXUS',
-    comiket: 'ABOUT COMIKET',
-    ironcore: 'ABOUT IRONCORE'
-  }
-  return titles[theme.value] || titles.nexus
-})
-
-const pageTag = computed(() => {
-  const tags: Record<string, string> = {
-    nexus: '// SYSTEM INFO',
-    comiket: '// 关于我们',
-    ironcore: '// UNIT PROFILE'
-  }
-  return tags[theme.value] || tags.nexus
-})
+const pageTitle = computed(() => t(`about.pageTitle.${theme.value}`))
+const pageTag = computed(() => t(`about.pageTag.${theme.value}`))
 
 const techStack = ['VUE 3', 'TYPESCRIPT', 'TAILWIND CSS', 'VITE']
 
-const platformFeatures = [
-  { icon: Cpu, title: '前沿科技', desc: '聚合全球最新科技动态与深度评测' },
-  { icon: Users, title: '游戏情报', desc: '覆盖主机、PC、手游全平台资讯' },
-  { icon: Layers, title: '二次元文化', desc: '动漫、漫画、轻小说文化速递' },
-  { icon: MessageCircle, title: '社区互动', desc: '评论、收藏、点赞与成就系统' }
-]
+const featureIcons = [Cpu, Users, Layers, MessageCircle]
+
+const platformFeatures = computed(() => {
+  const features = tm('about.features') as Array<{ title: string; desc: string }>
+  return features.map((f, i) => ({
+    icon: featureIcons[i] || Cpu,
+    title: f.title,
+    desc: f.desc
+  }))
+})
 </script>
 
 <template>

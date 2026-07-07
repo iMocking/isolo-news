@@ -5,30 +5,66 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"isolo-news/internal/dto"
+	"isolo-news/internal/ent"
+	"isolo-news/internal/ent/article"
 	"isolo-news/pkg/response"
 )
 
 // CategoryHandler 分类处理器
-type CategoryHandler struct{}
+type CategoryHandler struct {
+	db *ent.Client
+}
 
 // NewCategoryHandler 创建分类处理器
-func NewCategoryHandler() *CategoryHandler {
-	return &CategoryHandler{}
+func NewCategoryHandler(db *ent.Client) *CategoryHandler {
+	return &CategoryHandler{db: db}
 }
 
 // GetCategories 获取分类列表
+// 从数据库读取所有分类，并实时计算每类的文章数
 // GET /api/v1/categories
 func (h *CategoryHandler) GetCategories(c *gin.Context) {
-	// 返回预设分类列表（后续从数据库读取）
-	categories := []dto.CategoryVO{
-		{Slug: "all", Name: "全部", DisplayName: "全部", Color: "#00f0ff", ArticleCount: 2847},
-		{Slug: "tech", Name: "AI前沿", DisplayName: "AI前沿", Color: "#00f0ff", ArticleCount: 1203},
-		{Slug: "ai_robot", Name: "AI机器人", DisplayName: "AI机器人", Color: "#4ecdc4", ArticleCount: 456},
-		{Slug: "ai_coding", Name: "AI编程", DisplayName: "AI编程", Color: "#3b9eff", ArticleCount: 342},
-		{Slug: "hardware", Name: "AI硬件", DisplayName: "AI硬件", Color: "#0aaaff", ArticleCount: 412},
-		{Slug: "anime", Name: "二次元", DisplayName: "二次元", Color: "#ffaa00", ArticleCount: 376},
-		{Slug: "godot", Name: "Godot游戏", DisplayName: "Godot游戏", Color: "#ff6b2b", ArticleCount: 158},
+	ctx := c.Request.Context()
+
+	// 查询所有分类
+	categories, err := h.db.Category.Query().
+		Order(ent.Asc("sort_order")).
+		All(ctx)
+	if err != nil {
+		response.Error(c, 500, response.CodeInternalError)
+		return
 	}
 
-	response.Success(c, categories)
+	// 转换为 VO，实时计算文章数
+	result := make([]dto.CategoryVO, 0, len(categories)+1)
+
+	// 统计全站文章总数
+	totalCount, _ := h.db.Article.Query().Count(ctx)
+
+	// 添加"全部"虚拟分类
+	result = append(result, dto.CategoryVO{
+		Slug:         "all",
+		Name:         "全部",
+		DisplayName:  "全部",
+		Color:        "#00f0ff",
+		ArticleCount: totalCount,
+	})
+
+	// 逐个统计每类文章数
+	for _, cat := range categories {
+		articleCount, _ := h.db.Article.Query().
+			Where(article.CategoryIDEQ(cat.Slug)).
+			Count(ctx)
+
+		result = append(result, dto.CategoryVO{
+			Slug:         cat.Slug,
+			Name:         cat.Name,
+			DisplayName:  cat.DisplayName,
+			Color:        cat.Color,
+			Icon:         cat.Icon,
+			ArticleCount: articleCount,
+		})
+	}
+
+	response.Success(c, result)
 }

@@ -66,7 +66,7 @@
             :style="searchResultCardStyle"
             @mouseenter="handleCardHover($event, result.category)"
             @mouseleave="handleCardLeave($event)"
-            @click="router.push(`/article/${result.id}`)"
+            @click="router.push(`/article/detail/${result.id}`)"
           >
             <div class="p-5">
               <div class="flex items-center gap-2 mb-2">
@@ -227,11 +227,10 @@ const getCategoryColor = (category: any) => {
   return colors[slug] || 'var(--color-primary)'
 }
 
-const getCategoryName = (category: any) => {
-  if (typeof category === 'object' && category?.name) return category.name
-  const key = `articleList.categories.${category}`
-  const name = t(key)
-  return name !== key ? name : (category || '')
+const getCategoryName = (category: any): string => {
+  const slug = typeof category === 'string' ? category : category?.slug || ''
+  const translated = t(`categories.${slug}`)
+  return translated !== `categories.${slug}` ? translated : (category?.name || slug)
 }
 
 const handleCardHover = (event: MouseEvent, category: any) => {

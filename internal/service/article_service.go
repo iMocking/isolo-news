@@ -5,6 +5,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log"
 	"math"
 	"time"
 
@@ -18,13 +19,31 @@ import (
 
 // ArticleService 资讯服务
 type ArticleService struct {
-	db   *ent.Client
-	game *GameService
+	db          *ent.Client
+	game        *GameService
+	categoryMap map[string]*ent.Category // slug -> 分类缓存，toVO 中使用
 }
 
 // NewArticleService 创建资讯服务
 func NewArticleService(db *ent.Client, game *GameService) *ArticleService {
-	return &ArticleService{db: db, game: game}
+	svc := &ArticleService{db: db, game: game}
+	// 初始化分类缓存
+	svc.refreshCategoryMap(context.Background())
+	return svc
+}
+
+// refreshCategoryMap 刷新分类缓存（采集完成后调用）
+func (s *ArticleService) refreshCategoryMap(ctx context.Context) {
+	cats, err := s.db.Category.Query().All(ctx)
+	if err != nil {
+		log.Printf("[ArticleService] 加载分类缓存失败: %v", err)
+		return
+	}
+	m := make(map[string]*ent.Category, len(cats))
+	for _, cat := range cats {
+		m[cat.Slug] = cat
+	}
+	s.categoryMap = m
 }
 
 // List 获取资讯列表（分页+筛选+搜索）
@@ -252,38 +271,18 @@ func (s *ArticleService) RecordRead(ctx context.Context, userID, articleID strin
 }
 
 // toVO 将 Ent Article 转换为 ArticleVO
+// 分类信息从缓存中查询，无需硬编码
 func (s *ArticleService) toVO(a *ent.Article) dto.ArticleVO {
-	catName := "AI前沿"
-	catSlug := "tech"
+	// 从分类缓存中查找（兜底使用 slug 本身）
+	cat, hasCat := s.categoryMap[a.CategoryID]
+	catSlug := a.CategoryID
+	catName := catSlug
 	catColor := "#00f0ff"
 	catIcon := ""
-
-	// 根据 category_id 映射分类展示名
-	switch a.CategoryID {
-	case "tech":
-		catName = "AI前沿"
-		catSlug = "tech"
-		catColor = "#00f0ff"
-	case "ai_robot":
-		catName = "AI机器人"
-		catSlug = "ai_robot"
-		catColor = "#4ecdc4"
-	case "ai_coding":
-		catName = "AI编程"
-		catSlug = "ai_coding"
-		catColor = "#3b9eff"
-	case "hardware":
-		catName = "AI硬件"
-		catSlug = "hardware"
-		catColor = "#0aaaff"
-	case "anime":
-		catName = "二次元"
-		catSlug = "anime"
-		catColor = "#ffaa00"
-	case "godot":
-		catName = "Godot游戏"
-		catSlug = "godot"
-		catColor = "#ff6b2b"
+	if hasCat {
+		catName = cat.DisplayName
+		catColor = cat.Color
+		catIcon = cat.Icon
 	}
 
 	return dto.ArticleVO{

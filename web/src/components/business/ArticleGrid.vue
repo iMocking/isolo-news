@@ -111,8 +111,11 @@ interface Props {
   emptyType?: 'empty' | 'offline' | 'search-empty'
 }
 
-const getCategoryName = (cat: any): string =>
-  typeof cat === 'string' ? cat : cat?.name || ''
+const getCategoryName = (cat: any): string => {
+  const slug = typeof cat === 'string' ? cat : cat?.slug || ''
+  const translated = t(`categories.${slug}`)
+  return translated !== `categories.${slug}` ? translated : (cat?.name || slug)
+}
 
 const getCatSlug = (cat: any): string =>
   typeof cat === 'string' ? cat : cat?.slug || ''
@@ -137,7 +140,7 @@ const { getCardStyle } = useCardStyles()
 const { isRead } = useReadTracker()
 
 const handleArticleClick = (articleId: string) => {
-  router.push(`/article/${articleId}`)
+  router.push(`/article/detail/${articleId}`)
 }
 
 const hoveredCards = ref<Set<string>>(new Set())

@@ -132,6 +132,7 @@ var (
 		{Name: "color", Type: field.TypeString},
 		{Name: "icon", Type: field.TypeString, Nullable: true},
 		{Name: "sort_order", Type: field.TypeInt, Default: 0},
+		{Name: "total", Type: field.TypeInt, Default: 0},
 	}
 	// CategoriesTable holds the schema information for the "categories" table.
 	CategoriesTable = &schema.Table{

@@ -1,7 +1,5 @@
 <template>
-  <div class="min-h-screen">
-    <AppNavigation />
-
+  <div>
     <!-- Article Hero -->
     <section class="w-full relative overflow-hidden" style="background: linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-card) 100%);">
       <div v-if="themeStore.currentTheme === 'nexus'" class="absolute inset-0 pointer-events-none opacity-5" style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--color-text-primary) 2px, var(--color-text-primary) 3px);"></div>
@@ -18,7 +16,7 @@
       <div v-else-if="loadError && !currentArticle" class="max-w-7xl mx-auto px-6 pt-24 pb-10 relative z-10">
         <div class="flex flex-col items-center justify-center py-20">
           <p class="text-sm mb-4" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">⚠ {{ $t('common.errors.networkError') }}</p>
-          <router-link to="/list" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium transition-all duration-150"
+          <router-link to="/article/list" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium transition-all duration-150"
             :style="{ background: 'var(--color-primary50)', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', borderRadius: 'var(--radius-sm)' }">
             <ArrowLeft class="w-3 h-3" />
             <span>{{ $t('articleDetail.backToList') }}</span>
@@ -32,14 +30,14 @@
         <div class="flex items-center gap-2 mb-8">
           <router-link to="/" class="text-xs whitespace-nowrap transition-colors duration-150" style="color: var(--color-text-tertiary);" @mouseenter="($event.target as HTMLElement).style.color = 'var(--color-primary)'" @mouseleave="($event.target as HTMLElement).style.color = 'var(--color-text-tertiary)'">{{ $t('articleDetail.breadcrumb.home') }}</router-link>
           <span class="text-xs" style="color: var(--color-text-tertiary);">/</span>
-          <router-link to="/list" class="text-xs whitespace-nowrap transition-colors duration-150" style="color: var(--color-text-tertiary);" @mouseenter="($event.target as HTMLElement).style.color = 'var(--color-primary)'" @mouseleave="($event.target as HTMLElement).style.color = 'var(--color-text-tertiary)'">{{ $t('articleDetail.breadcrumb.list') }}</router-link>
+          <router-link to="/article/list" class="text-xs whitespace-nowrap transition-colors duration-150" style="color: var(--color-text-tertiary);" @mouseenter="($event.target as HTMLElement).style.color = 'var(--color-primary)'" @mouseleave="($event.target as HTMLElement).style.color = 'var(--color-text-tertiary)'">{{ $t('articleDetail.breadcrumb.list') }}</router-link>
           <span class="text-xs" style="color: var(--color-text-tertiary);">/</span>
           <span class="text-xs whitespace-nowrap" style="color: var(--color-text-secondary);">{{ $t('articleDetail.breadcrumb.current') }}</span>
         </div>
 
         <!-- Category badge -->
         <div class="mb-6">
-          <span class="inline-flex items-center px-3 py-1 text-xs font-semibold whitespace-nowrap" :style="{ background: getCategoryBg(currentArticle.category?.slug), color: getCategoryColor(currentArticle.category?.slug), border: `1px solid ${getCategoryBorder(currentArticle.category?.slug)}`, fontFamily: 'var(--font-display)', letterSpacing: '0.05em' }">{{ currentArticle.category?.name || currentArticle.category }}</span>
+          <span class="inline-flex items-center px-3 py-1 text-xs font-semibold whitespace-nowrap" :style="{ background: getCategoryBg(currentArticle.category?.slug), color: getCategoryColor(currentArticle.category?.slug), border: `1px solid ${getCategoryBorder(currentArticle.category?.slug)}`, fontFamily: 'var(--font-display)', letterSpacing: '0.05em' }">{{ $t(`categories.${currentArticle.category?.slug || currentArticle.category}`) }}</span>
         </div>
 
         <!-- Article title -->
@@ -138,7 +136,7 @@
             </div>
 
             <!-- Back button -->
-            <router-link to="/list" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-all duration-150" style="background: var(--color-primary-50); color: var(--color-primary); border: 1px solid var(--color-border);" @mouseenter="($event.target as HTMLElement).style.background = 'var(--color-primary-100)'; ($event.target as HTMLElement).style.transform = 'translateY(-1px)'" @mouseleave="($event.target as HTMLElement).style.background = 'var(--color-primary-50)'; ($event.target as HTMLElement).style.transform = 'translateY(0)'">
+            <router-link to="/article/list" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-all duration-150" style="background: var(--color-primary-50); color: var(--color-primary); border: 1px solid var(--color-border);" @mouseenter="($event.target as HTMLElement).style.background = 'var(--color-primary-100)'; ($event.target as HTMLElement).style.transform = 'translateY(-1px)'" @mouseleave="($event.target as HTMLElement).style.background = 'var(--color-primary-50)'; ($event.target as HTMLElement).style.transform = 'translateY(0)'">
               <ArrowLeft class="w-4 h-4" />
               <span>{{ $t('articleDetail.backToList') }}</span>
             </router-link>
@@ -150,8 +148,6 @@
         <ArticleSidebar :articleId="articleId" :currentArticle="currentArticle" :commentCount="commentCount" />
       </div>
     </section>
-
-    <AppFooter />
   </div>
 </template>
 
@@ -164,8 +160,6 @@ import { useUserStore } from '@/stores/userStore'
 import { fetchArticleById, recordRead } from '@/api/articles'
 import { Eye, ArrowLeft } from 'lucide-vue-next'
 import { useReadTracker } from '@/composables/useReadTracker'
-import AppNavigation from '@/components/layout/AppNavigation.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
 import ArticleComments from '@/components/business/ArticleComments.vue'
 import ArticleSidebar from '@/components/business/ArticleSidebar.vue'
 

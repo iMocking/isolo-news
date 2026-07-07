@@ -27,6 +27,8 @@ const (
 	FieldIcon = "icon"
 	// FieldSortOrder holds the string denoting the sort_order field in the database.
 	FieldSortOrder = "sort_order"
+	// FieldTotal holds the string denoting the total field in the database.
+	FieldTotal = "total"
 	// Table holds the table name of the category in the database.
 	Table = "categories"
 )
@@ -42,6 +44,7 @@ var Columns = []string{
 	FieldColor,
 	FieldIcon,
 	FieldSortOrder,
+	FieldTotal,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -71,6 +74,8 @@ var (
 	ColorValidator func(string) error
 	// DefaultSortOrder holds the default value on creation for the "sort_order" field.
 	DefaultSortOrder int
+	// DefaultTotal holds the default value on creation for the "total" field.
+	DefaultTotal int
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 )
@@ -121,4 +126,9 @@ func ByIcon(opts ...sql.OrderTermOption) OrderOption {
 // BySortOrder orders the results by the sort_order field.
 func BySortOrder(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSortOrder, opts...).ToFunc()
+}
+
+// ByTotal orders the results by the total field.
+func ByTotal(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTotal, opts...).ToFunc()
 }

@@ -1,8 +1,8 @@
 <template>
-  <aside class="lg:col-span-1 space-y-8">
+  <aside class="lg:col-span-1 space-y-8 sticky top-24 self-start">
     <!-- Related Missions -->
     <div class="p-5" :style="sidebarPanelStyle">
-      <h3 class="text-sm font-semibold mb-4 pb-3 whitespace-nowrap" style="color: var(--color-text-primary); font-family: var(--font-display); letter-spacing: 0.02em; border-bottom: 1px solid var(--color-border-subtle);">相关任务</h3>
+      <h3 class="text-sm font-semibold mb-4 pb-3 whitespace-nowrap" style="color: var(--color-text-primary); font-family: var(--font-display); letter-spacing: 0.02em; border-bottom: 1px solid var(--color-border-subtle);">{{ $t('articleDetail.sidebar.related') }}</h3>
       <div class="space-y-4">
         <a v-for="(item, index) in relatedArticles" :key="index" href="#" class="block group">
           <div class="flex items-start gap-3">
@@ -20,7 +20,7 @@
 
     <!-- Interaction Area — 横排纵向布局 -->
     <div class="p-5" :style="sidebarPanelStyle">
-      <h3 class="text-sm font-semibold mb-4 pb-3 whitespace-nowrap" style="color: var(--color-text-primary); font-family: var(--font-display); letter-spacing: 0.02em; border-bottom: 1px solid var(--color-border-subtle);">互动区</h3>
+      <h3 class="text-sm font-semibold mb-4 pb-3 whitespace-nowrap" style="color: var(--color-text-primary); font-family: var(--font-display); letter-spacing: 0.02em; border-bottom: 1px solid var(--color-border-subtle);">{{ $t('articleDetail.sidebar.interactions') }}</h3>
       <div class="grid grid-cols-4 gap-2">
         <!-- 评论 -->
         <button class="flex flex-col items-center gap-1.5 py-3 px-1 rounded-lg transition-all duration-150 cursor-default" :style="interactionCardStyle">
@@ -49,19 +49,19 @@
 
     <!-- XP Summary — 数据来自 userStore -->
     <div class="p-5" :style="xpPanelStyle">
-      <h3 class="text-sm font-semibold mb-4 pb-3 whitespace-nowrap" style="color: var(--color-primary); font-family: var(--font-display); letter-spacing: 0.02em; border-bottom: 1px solid var(--color-border-subtle);">XP 总览</h3>
+      <h3 class="text-sm font-semibold mb-4 pb-3 whitespace-nowrap" style="color: var(--color-primary); font-family: var(--font-display); letter-spacing: 0.02em; border-bottom: 1px solid var(--color-border-subtle);">{{ $t('articleDetail.sidebar.xpOverview') }}</h3>
       <div class="space-y-3">
         <div class="flex items-center justify-between">
-          <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">本篇奖励</span>
+          <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">{{ $t('articleDetail.sidebar.xpThisArticle') }}</span>
           <span class="text-sm font-semibold whitespace-nowrap" style="color: var(--color-primary); font-family: var(--font-display);">+{{ currentArticle.xpReward || 0 }} XP</span>
         </div>
         <div class="flex items-center justify-between">
-          <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">当前等级</span>
+          <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">{{ $t('articleDetail.sidebar.currentLevel') }}</span>
           <span class="text-sm font-semibold whitespace-nowrap" style="color: var(--color-state-success); font-family: var(--font-display);">LV.{{ userStore.level }}</span>
         </div>
         <div class="pt-2" style="border-top: 1px solid var(--color-border-subtle);">
           <div class="flex items-center justify-between mb-1">
-            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">距离 LV.{{ userStore.level + 1 }}</span>
+            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">{{ $t('articleDetail.sidebar.xpToNextLevel', { level: userStore.level + 1 }) }}</span>
             <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">{{ userStore.xp }} / {{ userStore.maxXp }} XP</span>
           </div>
           <div class="w-full h-2 rounded-full overflow-hidden" style="background: var(--color-bg-tertiary);">

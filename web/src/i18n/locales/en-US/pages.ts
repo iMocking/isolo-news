@@ -41,10 +41,13 @@ export default {
     categories: {
       all: 'All',
       tech: 'Tech',
-      game: 'Gaming',
+      ai_robot: 'AI Robot',
+      ai_coding: 'AI Coding',
       hardware: 'Hardware',
-      anime: 'Anime'
-    }
+      anime: 'Anime',
+      godot: 'Godot'
+    },
+    read: 'Read'
   },
 
   // ==================== Article Detail ====================
@@ -87,7 +90,8 @@ export default {
       xpOverview: 'XP Overview',
       xpThisArticle: 'This Article',
       xpToday: 'Today Earned',
-      xpToNextLevel: 'To LV.{level}'
+      xpToNextLevel: 'To LV.{level}',
+      currentLevel: 'Current Level'
     }
   },
 
@@ -135,6 +139,7 @@ export default {
       comiket: 'COMIKET User',
       ironcore: 'Iron Agent'
     },
+    unitDays: ' days',
     playerTitle: {
       nexus: 'Cyber Pioneer // Intel Hunter',
       comiket: 'Manga Master // Tech Lover',
@@ -145,6 +150,21 @@ export default {
   // ==================== Settings ====================
   settings: {
     subtitle: '// System Config',
+    pageTitle: {
+      nexus: 'SYSTEM CONFIG',
+      comiket: 'System Config',
+      ironcore: 'COMMAND CONFIG'
+    },
+    pageTag: {
+      nexus: '// System Preferences',
+      comiket: '// Personalization',
+      ironcore: '// Battle Config'
+    },
+    pageSubtitle: {
+      nexus: 'Adjust system parameters, notification preferences & profile',
+      comiket: 'Personalize your reading experience & interface theme',
+      ironcore: 'Configure battle parameters & system preferences'
+    },
     notifications: {
       title: 'Notifications',
       push: 'Push Notifications',
@@ -233,6 +253,22 @@ export default {
   // ==================== About ====================
   about: {
     subtitle: '// About System',
+    pageTitle: {
+      nexus: 'ABOUT NEXUS',
+      comiket: 'ABOUT COMIKET',
+      ironcore: 'ABOUT IRONCORE'
+    },
+    pageTag: {
+      nexus: '// SYSTEM INFO',
+      comiket: '// About Us',
+      ironcore: '// UNIT PROFILE'
+    },
+    features: [
+      { title: 'Cutting-edge Tech', desc: 'Latest global tech news & in-depth reviews' },
+      { title: 'Gaming Intel', desc: 'Covering console, PC & mobile platforms' },
+      { title: 'Anime Culture', desc: 'Anime, manga & light novel culture updates' },
+      { title: 'Community', desc: 'Comments, favorites, likes & achievement system' }
+    ],
     intro: 'NEXUS DAILY is a cyberpunk-themed tech & anime intel platform, blending tech news, game reviews, hardware analysis, and anime culture for an immersive reading experience.',
     sections: {
       platform: 'Platform',

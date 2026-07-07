@@ -43,32 +43,9 @@ const selectTheme = (theme: string) => {
 
 const theme = computed(() => themeStore.currentTheme)
 
-const pageTitle = computed(() => {
-  const titles: Record<string, string> = {
-    nexus: 'SYSTEM CONFIG',
-    comiket: '系统配置',
-    ironcore: 'COMMAND CONFIG'
-  }
-  return titles[theme.value] || titles.nexus
-})
-
-const pageTag = computed(() => {
-  const tags: Record<string, string> = {
-    nexus: '// 系统参数调整',
-    comiket: '// 个性化设置',
-    ironcore: '// 作战参数配置'
-  }
-  return tags[theme.value] || tags.nexus
-})
-
-const pageSubtitle = computed(() => {
-  const subtitles: Record<string, string> = {
-    nexus: '调整系统参数、通知偏好与个人资料',
-    comiket: '个性化你的阅读体验与界面主题',
-    ironcore: '配置作战参数与系统偏好'
-  }
-  return subtitles[theme.value] || subtitles.nexus
-})
+const pageTitle = computed(() => t(`settings.pageTitle.${theme.value}`))
+const pageTag = computed(() => t(`settings.pageTag.${theme.value}`))
+const pageSubtitle = computed(() => t(`settings.pageSubtitle.${theme.value}`))
 
 const themeLabels: Record<string, string> = {
   nexus: t('settings.theme.nexus'),

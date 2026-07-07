@@ -57,6 +57,32 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
+
+  /* ==================== 全局极窄滚动条 ==================== */
+  /* Chrome / Safari / Edge */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-primaryLight);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primaryLight) transparent;
+  }
 }
 
 @layer utilities {

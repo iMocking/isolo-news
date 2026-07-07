@@ -65,6 +65,9 @@ func main() {
 	if err := seeder.SeedData(ctx, db); err != nil {
 		log.Printf("初始化种子数据: %v", err)
 	}
+	// 兼容已有安装：激活旧源 + 补充中文等新增数据源
+	seeder.ActivateSources(ctx, db)
+	seeder.AddMissingSources(ctx, db)
 
 	// 初始化 Casbin 权限引擎
 	enforcer, err := casbin.InitCasbin(cfg)
@@ -89,10 +92,10 @@ func main() {
 	}
 
 	// 初始化 HTTP 处理器
-	articleHandler := handler.NewArticleHandler(articleSvc)
+	articleHandler := handler.NewArticleHandler(articleSvc, gameSvc)
 	authHandler := handler.NewAuthHandler(authSvc)
 	userHandler := handler.NewUserHandler(userSvc)
-	categoryHandler := handler.NewCategoryHandler()
+	categoryHandler := handler.NewCategoryHandler(db)
 
 	// 创建 Gin 引擎并注册路由
 	r := gin.New()

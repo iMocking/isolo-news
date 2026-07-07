@@ -103,6 +103,11 @@ func SortOrder(v int) predicate.Category {
 	return predicate.Category(sql.FieldEQ(FieldSortOrder, v))
 }
 
+// Total applies equality check predicate on the "total" field. It's identical to TotalEQ.
+func Total(v int) predicate.Category {
+	return predicate.Category(sql.FieldEQ(FieldTotal, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v int64) predicate.Category {
 	return predicate.Category(sql.FieldEQ(FieldCreatedAt, v))
@@ -556,6 +561,46 @@ func SortOrderLT(v int) predicate.Category {
 // SortOrderLTE applies the LTE predicate on the "sort_order" field.
 func SortOrderLTE(v int) predicate.Category {
 	return predicate.Category(sql.FieldLTE(FieldSortOrder, v))
+}
+
+// TotalEQ applies the EQ predicate on the "total" field.
+func TotalEQ(v int) predicate.Category {
+	return predicate.Category(sql.FieldEQ(FieldTotal, v))
+}
+
+// TotalNEQ applies the NEQ predicate on the "total" field.
+func TotalNEQ(v int) predicate.Category {
+	return predicate.Category(sql.FieldNEQ(FieldTotal, v))
+}
+
+// TotalIn applies the In predicate on the "total" field.
+func TotalIn(vs ...int) predicate.Category {
+	return predicate.Category(sql.FieldIn(FieldTotal, vs...))
+}
+
+// TotalNotIn applies the NotIn predicate on the "total" field.
+func TotalNotIn(vs ...int) predicate.Category {
+	return predicate.Category(sql.FieldNotIn(FieldTotal, vs...))
+}
+
+// TotalGT applies the GT predicate on the "total" field.
+func TotalGT(v int) predicate.Category {
+	return predicate.Category(sql.FieldGT(FieldTotal, v))
+}
+
+// TotalGTE applies the GTE predicate on the "total" field.
+func TotalGTE(v int) predicate.Category {
+	return predicate.Category(sql.FieldGTE(FieldTotal, v))
+}
+
+// TotalLT applies the LT predicate on the "total" field.
+func TotalLT(v int) predicate.Category {
+	return predicate.Category(sql.FieldLT(FieldTotal, v))
+}
+
+// TotalLTE applies the LTE predicate on the "total" field.
+func TotalLTE(v int) predicate.Category {
+	return predicate.Category(sql.FieldLTE(FieldTotal, v))
 }
 
 // And groups predicates with the AND operator between them.

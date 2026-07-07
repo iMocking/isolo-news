@@ -209,6 +209,10 @@ func init() {
 	categoryDescSortOrder := categoryFields[5].Descriptor()
 	// category.DefaultSortOrder holds the default value on creation for the sort_order field.
 	category.DefaultSortOrder = categoryDescSortOrder.Default.(int)
+	// categoryDescTotal is the schema descriptor for total field.
+	categoryDescTotal := categoryFields[6].Descriptor()
+	// category.DefaultTotal holds the default value on creation for the total field.
+	category.DefaultTotal = categoryDescTotal.Default.(int)
 	// categoryDescID is the schema descriptor for id field.
 	categoryDescID := categoryMixinFields0[0].Descriptor()
 	// category.DefaultID holds the default value on creation for the id field.

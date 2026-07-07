@@ -88,8 +88,9 @@ type QuestVO struct {
 	XPReward    int    `json:"xpReward"`
 	Progress    int    `json:"progress"`
 	Target      int    `json:"target"`
-	Status      string `json:"status"` // not_started / in_progress / completed
+	Status      string `json:"status"`   // not_started / in_progress / completed
 	Icon        string `json:"icon"`
+	QuestType   string `json:"questType"` // read_articles / login / comment
 }
 
 // AchievementVO 成就视图对象

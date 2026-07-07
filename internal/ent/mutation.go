@@ -3267,6 +3267,8 @@ type CategoryMutation struct {
 	icon          *string
 	sort_order    *int
 	addsort_order *int
+	total         *int
+	addtotal      *int
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Category, error)
@@ -3738,6 +3740,62 @@ func (m *CategoryMutation) ResetSortOrder() {
 	m.addsort_order = nil
 }
 
+// SetTotal sets the "total" field.
+func (m *CategoryMutation) SetTotal(i int) {
+	m.total = &i
+	m.addtotal = nil
+}
+
+// Total returns the value of the "total" field in the mutation.
+func (m *CategoryMutation) Total() (r int, exists bool) {
+	v := m.total
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotal returns the old "total" field's value of the Category entity.
+// If the Category object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CategoryMutation) OldTotal(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotal is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotal requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotal: %w", err)
+	}
+	return oldValue.Total, nil
+}
+
+// AddTotal adds i to the "total" field.
+func (m *CategoryMutation) AddTotal(i int) {
+	if m.addtotal != nil {
+		*m.addtotal += i
+	} else {
+		m.addtotal = &i
+	}
+}
+
+// AddedTotal returns the value that was added to the "total" field in this mutation.
+func (m *CategoryMutation) AddedTotal() (r int, exists bool) {
+	v := m.addtotal
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotal resets all changes to the "total" field.
+func (m *CategoryMutation) ResetTotal() {
+	m.total = nil
+	m.addtotal = nil
+}
+
 // Where appends a list predicates to the CategoryMutation builder.
 func (m *CategoryMutation) Where(ps ...predicate.Category) {
 	m.predicates = append(m.predicates, ps...)
@@ -3772,7 +3830,7 @@ func (m *CategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CategoryMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, category.FieldCreatedAt)
 	}
@@ -3796,6 +3854,9 @@ func (m *CategoryMutation) Fields() []string {
 	}
 	if m.sort_order != nil {
 		fields = append(fields, category.FieldSortOrder)
+	}
+	if m.total != nil {
+		fields = append(fields, category.FieldTotal)
 	}
 	return fields
 }
@@ -3821,6 +3882,8 @@ func (m *CategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Icon()
 	case category.FieldSortOrder:
 		return m.SortOrder()
+	case category.FieldTotal:
+		return m.Total()
 	}
 	return nil, false
 }
@@ -3846,6 +3909,8 @@ func (m *CategoryMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldIcon(ctx)
 	case category.FieldSortOrder:
 		return m.OldSortOrder(ctx)
+	case category.FieldTotal:
+		return m.OldTotal(ctx)
 	}
 	return nil, fmt.Errorf("unknown Category field %s", name)
 }
@@ -3911,6 +3976,13 @@ func (m *CategoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSortOrder(v)
 		return nil
+	case category.FieldTotal:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotal(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Category field %s", name)
 }
@@ -3928,6 +4000,9 @@ func (m *CategoryMutation) AddedFields() []string {
 	if m.addsort_order != nil {
 		fields = append(fields, category.FieldSortOrder)
 	}
+	if m.addtotal != nil {
+		fields = append(fields, category.FieldTotal)
+	}
 	return fields
 }
 
@@ -3942,6 +4017,8 @@ func (m *CategoryMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUpdatedAt()
 	case category.FieldSortOrder:
 		return m.AddedSortOrder()
+	case category.FieldTotal:
+		return m.AddedTotal()
 	}
 	return nil, false
 }
@@ -3971,6 +4048,13 @@ func (m *CategoryMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddSortOrder(v)
+		return nil
+	case category.FieldTotal:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotal(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Category numeric field %s", name)
@@ -4031,6 +4115,9 @@ func (m *CategoryMutation) ResetField(name string) error {
 		return nil
 	case category.FieldSortOrder:
 		m.ResetSortOrder()
+		return nil
+	case category.FieldTotal:
+		m.ResetTotal()
 		return nil
 	}
 	return fmt.Errorf("unknown Category field %s", name)

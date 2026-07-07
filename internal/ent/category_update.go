@@ -137,6 +137,27 @@ func (_u *CategoryUpdate) AddSortOrder(v int) *CategoryUpdate {
 	return _u
 }
 
+// SetTotal sets the "total" field.
+func (_u *CategoryUpdate) SetTotal(v int) *CategoryUpdate {
+	_u.mutation.ResetTotal()
+	_u.mutation.SetTotal(v)
+	return _u
+}
+
+// SetNillableTotal sets the "total" field if the given value is not nil.
+func (_u *CategoryUpdate) SetNillableTotal(v *int) *CategoryUpdate {
+	if v != nil {
+		_u.SetTotal(*v)
+	}
+	return _u
+}
+
+// AddTotal adds value to the "total" field.
+func (_u *CategoryUpdate) AddTotal(v int) *CategoryUpdate {
+	_u.mutation.AddTotal(v)
+	return _u
+}
+
 // Mutation returns the CategoryMutation object of the builder.
 func (_u *CategoryUpdate) Mutation() *CategoryMutation {
 	return _u.mutation
@@ -244,6 +265,12 @@ func (_u *CategoryUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedSortOrder(); ok {
 		_spec.AddField(category.FieldSortOrder, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Total(); ok {
+		_spec.SetField(category.FieldTotal, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTotal(); ok {
+		_spec.AddField(category.FieldTotal, field.TypeInt, value)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -372,6 +399,27 @@ func (_u *CategoryUpdateOne) SetNillableSortOrder(v *int) *CategoryUpdateOne {
 // AddSortOrder adds value to the "sort_order" field.
 func (_u *CategoryUpdateOne) AddSortOrder(v int) *CategoryUpdateOne {
 	_u.mutation.AddSortOrder(v)
+	return _u
+}
+
+// SetTotal sets the "total" field.
+func (_u *CategoryUpdateOne) SetTotal(v int) *CategoryUpdateOne {
+	_u.mutation.ResetTotal()
+	_u.mutation.SetTotal(v)
+	return _u
+}
+
+// SetNillableTotal sets the "total" field if the given value is not nil.
+func (_u *CategoryUpdateOne) SetNillableTotal(v *int) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetTotal(*v)
+	}
+	return _u
+}
+
+// AddTotal adds value to the "total" field.
+func (_u *CategoryUpdateOne) AddTotal(v int) *CategoryUpdateOne {
+	_u.mutation.AddTotal(v)
 	return _u
 }
 
@@ -512,6 +560,12 @@ func (_u *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err 
 	}
 	if value, ok := _u.mutation.AddedSortOrder(); ok {
 		_spec.AddField(category.FieldSortOrder, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Total(); ok {
+		_spec.SetField(category.FieldTotal, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTotal(); ok {
+		_spec.AddField(category.FieldTotal, field.TypeInt, value)
 	}
 	_node = &Category{config: _u.config}
 	_spec.Assign = _node.assignValues

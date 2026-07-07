@@ -85,6 +85,16 @@ type CollectorConfig struct {
 	MaxRetries int    `mapstructure:"max_retries"`
 	RetryDelay int    `mapstructure:"retry_delay"`
 	UserAgent  string `mapstructure:"user_agent"`
+	// Readability 全文提取配置
+	Readability ReadabilityConfig `mapstructure:"readability"`
+}
+
+// ReadabilityConfig 全文提取配置
+type ReadabilityConfig struct {
+	Enabled          bool `mapstructure:"enabled"`
+	MinContentLength int  `mapstructure:"min_content_length"`
+	Timeout          int  `mapstructure:"timeout"`
+	Concurrency      int  `mapstructure:"concurrency"`
 }
 
 // RedisConfig Redis 配置
@@ -188,7 +198,17 @@ func setDefaults(cfg *Config) {
 		cfg.Collector.RetryDelay = 5
 	}
 	if cfg.Collector.UserAgent == "" {
-		cfg.Collector.UserAgent = "Mozilla/5.0 (compatible; IsoloNewsBot/1.0)"
+		cfg.Collector.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+	}
+	// Readability 默认值（不干预 Enabled 开关，由配置文件决定）
+	if cfg.Collector.Readability.MinContentLength == 0 {
+		cfg.Collector.Readability.MinContentLength = 500
+	}
+	if cfg.Collector.Readability.Timeout == 0 {
+		cfg.Collector.Readability.Timeout = 10
+	}
+	if cfg.Collector.Readability.Concurrency == 0 {
+		cfg.Collector.Readability.Concurrency = 3
 	}
 	if cfg.Auth.AccessTokenTTL == 0 {
 		cfg.Auth.AccessTokenTTL = 7200

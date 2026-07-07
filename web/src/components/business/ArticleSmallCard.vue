@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ArticleVO } from '@/api/articles'
 import { useCardStyles } from '@/hooks/useCardStyles'
 import { useReadTracker } from '@/composables/useReadTracker'
@@ -43,6 +44,7 @@ const props = defineProps<{
 }>()
 
 const { isRead } = useReadTracker()
+const { t } = useI18n()
 
 defineEmits<{
   hover: [article: ArticleVO]
@@ -66,7 +68,11 @@ const formatTime = (ts: number | string): string => {
 }
 
 const slug = computed(() => getCatSlug(props.article.category))
-const categoryName = computed(() => typeof props.article.category === 'string' ? props.article.category : props.article.category?.name || '')
+const categoryName = computed(() => {
+  const translated = t(`categories.${slug.value}`)
+  const rawName = typeof props.article.category === 'string' ? '' : props.article.category?.name || ''
+  return translated !== `categories.${slug.value}` ? translated : (rawName || slug.value)
+})
 
 const cardStyle = computed(() => {
   return getCardStyle('default', props.isHovered)

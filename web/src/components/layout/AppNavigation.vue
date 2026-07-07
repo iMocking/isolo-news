@@ -200,7 +200,7 @@ const handleAvatarClick = () => {
 
 const navLinks = computed(() => [
   { path: '/', label: t('nav.intelligenceCenter') },
-  { path: '/list', label: t('nav.intelligenceWarehouse') },
+  { path: '/article/list', label: t('nav.intelligenceWarehouse') },
   { path: '/about', label: t('nav.aboutMe') }
 ])
 
@@ -284,7 +284,7 @@ const getLinkStyle = (path: string) => {
   const routePath = currentRoutePath.value
   const isActive =
     routePath === path ||
-    (path === '/list' && (routePath.startsWith('/list') || routePath.startsWith('/article')))
+    (path === '/article/list' && (routePath.startsWith('/article/list') || routePath.startsWith('/article/detail')))
 
   if (isActive) {
     return {

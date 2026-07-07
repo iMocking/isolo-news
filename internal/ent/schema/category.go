@@ -29,6 +29,8 @@ func (Category) Fields() []ent.Field {
 			Comment("对应的前端图标名"),
 		field.Int("sort_order").Default(0).
 			Comment("排序权重，越小越靠前"),
+		field.Int("total").Default(0).
+			Comment("文章总数（采集完成后自动更新）"),
 	}
 }
 

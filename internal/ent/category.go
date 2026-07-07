@@ -32,7 +32,9 @@ type Category struct {
 	// 对应的前端图标名
 	Icon string `json:"icon,omitempty"`
 	// 排序权重，越小越靠前
-	SortOrder    int `json:"sort_order,omitempty"`
+	SortOrder int `json:"sort_order,omitempty"`
+	// 文章总数（采集完成后自动更新）
+	Total        int `json:"total,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -41,7 +43,7 @@ func (*Category) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case category.FieldCreatedAt, category.FieldUpdatedAt, category.FieldSortOrder:
+		case category.FieldCreatedAt, category.FieldUpdatedAt, category.FieldSortOrder, category.FieldTotal:
 			values[i] = new(sql.NullInt64)
 		case category.FieldID, category.FieldSlug, category.FieldName, category.FieldDisplayName, category.FieldColor, category.FieldIcon:
 			values[i] = new(sql.NullString)
@@ -114,6 +116,12 @@ func (_m *Category) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.SortOrder = int(value.Int64)
 			}
+		case category.FieldTotal:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field total", values[i])
+			} else if value.Valid {
+				_m.Total = int(value.Int64)
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -173,6 +181,9 @@ func (_m *Category) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("sort_order=")
 	builder.WriteString(fmt.Sprintf("%v", _m.SortOrder))
+	builder.WriteString(", ")
+	builder.WriteString("total=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Total))
 	builder.WriteByte(')')
 	return builder.String()
 }

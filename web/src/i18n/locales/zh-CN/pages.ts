@@ -41,10 +41,13 @@ export default {
     categories: {
       all: '全部',
       tech: '科技',
-      game: '游戏',
+      ai_robot: 'AI机器人',
+      ai_coding: 'AI编程',
       hardware: '硬件',
-      anime: '二次元'
-    }
+      anime: '二次元',
+      godot: 'Godot'
+    },
+    read: '已读'
   },
 
   // ==================== 文章详情页 ====================
@@ -87,7 +90,8 @@ export default {
       xpOverview: 'XP 总览',
       xpThisArticle: '本篇奖励',
       xpToday: '今日已获',
-      xpToNextLevel: '距离 LV.{level}'
+      xpToNextLevel: '距离 LV.{level}',
+      currentLevel: '当前等级'
     }
   },
 
@@ -135,6 +139,7 @@ export default {
       comiket: 'COMIKET用户',
       ironcore: '铁核探员'
     },
+    unitDays: '天',
     playerTitle: {
       nexus: '赛博先锋 // 资讯猎人',
       comiket: '漫画达人 // 科技爱好者',
@@ -145,6 +150,21 @@ export default {
   // ==================== 设置页 ====================
   settings: {
     subtitle: '// 系统设置',
+    pageTitle: {
+      nexus: 'SYSTEM CONFIG',
+      comiket: '系统配置',
+      ironcore: 'COMMAND CONFIG'
+    },
+    pageTag: {
+      nexus: '// 系统参数调整',
+      comiket: '// 个性化设置',
+      ironcore: '// 作战参数配置'
+    },
+    pageSubtitle: {
+      nexus: '调整系统参数、通知偏好与个人资料',
+      comiket: '个性化你的阅读体验与界面主题',
+      ironcore: '配置作战参数与系统偏好'
+    },
     notifications: {
       title: '通知设置',
       push: '推送通知',
@@ -233,6 +253,22 @@ export default {
   // ==================== 关于页 ====================
   about: {
     subtitle: '// 关于系统',
+    pageTitle: {
+      nexus: 'ABOUT NEXUS',
+      comiket: 'ABOUT COMIKET',
+      ironcore: 'ABOUT IRONCORE'
+    },
+    pageTag: {
+      nexus: '// SYSTEM INFO',
+      comiket: '// 关于我们',
+      ironcore: '// UNIT PROFILE'
+    },
+    features: [
+      { title: '前沿科技', desc: '聚合全球最新科技动态与深度评测' },
+      { title: '游戏情报', desc: '覆盖主机、PC、手游全平台资讯' },
+      { title: '二次元文化', desc: '动漫、漫画、轻小说文化速递' },
+      { title: '社区互动', desc: '评论、收藏、点赞与成就系统' }
+    ],
     intro: 'NEXUS DAILY 是一个赛博朋克风格的科技与二次元情报平台，融合了科技资讯、游戏评测、硬件测评和二次元文化等内容，致力于为用户提供沉浸式的资讯阅读体验。',
     sections: {
       platform: '平台简介',

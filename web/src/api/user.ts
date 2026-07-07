@@ -25,6 +25,7 @@ export interface QuestVO {
   target: number
   status: 'not_started' | 'in_progress' | 'completed'
   icon?: string
+  questType?: string
 }
 
 /** 获取用户信息 */

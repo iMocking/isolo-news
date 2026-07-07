@@ -18,13 +18,13 @@
       <div v-for="article in articles" :key="article.id"
            class="rounded-lg p-4 cursor-pointer transition-all duration-150 hover:-translate-y-0.5"
            :style="cardStyle"
-           @click="router.push(`/article/${article.id}`)">
+           @click="router.push(`/article/detail/${article.id}`)">
         <div class="flex items-start gap-3">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 mb-2">
               <span class="px-2 py-0.5 rounded text-[10px] font-bold"
                     :style="{ background: 'var(--color-primary50)', color: 'var(--color-primary)', fontFamily: 'var(--font-mono)' }">
-                {{ typeof article.category === 'string' ? article.category : article.category?.name }}
+                {{ $t(`categories.${typeof article.category === 'string' ? article.category : article.category?.slug || ''}`) }}
               </span>
               <span v-if="article.xpReward" class="text-[10px]"
                     :style="{ color: 'var(--state-success)', fontFamily: 'var(--font-mono)' }">

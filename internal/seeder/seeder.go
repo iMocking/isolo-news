@@ -67,6 +67,7 @@ func SeedData(ctx context.Context, db *ent.Client) error {
 		siteURL    string
 		categoryID string
 	}{
+		// 英文源
 		{"Hacker News", "https://hnrss.org/frontpage", "https://news.ycombinator.com", "tech"},
 		{"TechCrunch AI", "https://techcrunch.com/category/artificial-intelligence/feed/", "https://techcrunch.com", "tech"},
 		{"MIT Tech Review - AI", "https://www.technologyreview.com/topic/artificial-intelligence/feed/", "https://www.technologyreview.com", "tech"},
@@ -77,6 +78,13 @@ func SeedData(ctx context.Context, db *ent.Client) error {
 		{"Anime News Network", "https://www.animenewsnetwork.com/newsroom/otakumagazine.xml", "https://www.animenewsnetwork.com", "anime"},
 		{"Godot Blog", "https://godotengine.org/blog/rss.xml", "https://godotengine.org", "godot"},
 		{"Reddit r/godot", "https://www.reddit.com/r/godot/.rss", "https://reddit.com/r/godot", "godot"},
+		// 中文源
+		{"36氪", "https://36kr.com/feed", "https://36kr.com", "tech"},
+		{"Solidot", "https://www.solidot.org/index.rss", "https://www.solidot.org", "tech"},
+		{"机器之心", "https://www.jiqizhixin.com/rss", "https://www.jiqizhixin.com", "tech"},
+		{"掘金", "https://juejin.cn/rss", "https://juejin.cn", "ai_coding"},
+		{"超能网", "https://www.expreview.com/feed", "https://www.expreview.com", "hardware"},
+		{"机核网", "https://www.gcores.com/rss", "https://www.gcores.com", "anime"},
 	}
 
 	for _, s := range sources {
@@ -207,5 +215,57 @@ func ActivateSources(ctx context.Context, db *ent.Client) {
 	}
 	if count > 0 {
 		log.Printf("已激活 %d 个旧数据源", count)
+	}
+}
+
+// AddMissingSources 添加种子数据中尚未入库的数据源（兼容已有安装）
+// 每次 seed 或 server 启动时调用，确保中文等新增源自动补充
+func AddMissingSources(ctx context.Context, db *ent.Client) {
+	newSources := []struct {
+		name       string
+		feedURL    string
+		siteURL    string
+		categoryID string
+	}{
+		// 中文源（与 SeedData 保持同步）
+		{"36氪", "https://36kr.com/feed", "https://36kr.com", "tech"},
+		{"Solidot", "https://www.solidot.org/index.rss", "https://www.solidot.org", "tech"},
+		{"机器之心", "https://www.jiqizhixin.com/rss", "https://www.jiqizhixin.com", "tech"},
+		{"掘金", "https://juejin.cn/rss", "https://juejin.cn", "ai_coding"},
+		{"超能网", "https://www.expreview.com/feed", "https://www.expreview.com", "hardware"},
+		{"机核网", "https://www.gcores.com/rss", "https://www.gcores.com", "anime"},
+	}
+
+	added := 0
+	for _, s := range newSources {
+		exists, err := db.Source.Query().
+			Where(source.FeedURLEQ(s.feedURL)).
+			Exist(ctx)
+		if err != nil {
+			log.Printf("[种子] 检查数据源 %s 失败: %v", s.name, err)
+			continue
+		}
+		if exists {
+			continue
+		}
+
+		_, err = db.Source.Create().
+			SetName(s.name).
+			SetFeedURL(s.feedURL).
+			SetSiteURL(s.siteURL).
+			SetCategoryID(s.categoryID).
+			SetIsActive(true).
+			SetFetchInterval(30).
+			Save(ctx)
+		if err != nil {
+			log.Printf("[种子] 添加数据源 %s 失败: %v", s.name, err)
+			continue
+		}
+		added++
+		log.Printf("[种子] 新增数据源: %s (%s)", s.name, s.categoryID)
+	}
+
+	if added > 0 {
+		log.Printf("[种子] 新增 %d 个数据源", added)
 	}
 }

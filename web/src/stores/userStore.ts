@@ -62,7 +62,6 @@ export const useUserStore = defineStore('user', () => {
         dailyQuests.value = questRes.data.map((q) => ({
           ...q,
           icon: q.icon || (q.status === 'completed' ? 'Check' : q.status === 'in_progress' ? 'BookOpen' : 'MessageSquare'),
-          statusText: q.status === 'completed' ? '已完成' : `进度 ${q.progress}/${q.target}`,
         }))
       }
 

@@ -1,9 +1,7 @@
 <template>
-  <div class="min-h-screen">
+  <div>
     <!-- Scanline overlay for NEXUS theme -->
-    <div v-if="themeStore.currentTheme === 'nexus'" class="fixed inset-0 pointer-events-none z-50 opacity-[0.03]" style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,240,255,0.08) 2px, rgba(0,240,255,0.08) 4px);"></div>
-    
-    <AppNavigation />
+    <div v-if="themeStore.currentTheme === 'nexus'" class="fixed inset-0 pointer-events-none z-50" style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,240,255,0.08) 2px, rgba(0,240,255,0.08) 4px);"></div>
     
     <!-- Page Header -->
     <section class="pt-24 pb-6 px-6">
@@ -46,7 +44,7 @@
               boxShadow: currentCategory === cat.id ? '0 0 12px rgba(0,240,255,0.2)' : 'none'
             }"
           >
-            {{ cat.name }} <span class="ml-1 text-xs" :style="{
+            {{ getCategoryName(cat.id) }} <span class="ml-1 text-xs" :style="{
               background: currentCategory === cat.id ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
               color: currentCategory === cat.id ? '#ffffff' : 'var(--color-text-tertiary)',
               padding: '1px 6px',
@@ -72,7 +70,7 @@
                 ...articleCardStyle,
                 borderLeft: `3px solid ${getCategoryColor(article.category)}`
               }"
-              @click="router.push(`/article/${article.id}`)"
+              @click="router.push(`/article/detail/${article.id}`)"
             >
               <div class="shrink-0 w-12 flex items-center justify-center mr-5">
                 <span class="text-2xl font-bold" :style="{ fontFamily: 'var(--font-display)', color: getCategoryColor(article.category) }">
@@ -88,7 +86,7 @@
                   fontFamily: 'var(--font-mono)'
                 }">{{ getCategoryName(article.category) }}</span>
                 <!-- 已读角标 -->
-                <span v-if="isRead(article.id)" class="shrink-0 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap" style="background: var(--color-primary); color: white; border-radius: var(--radius-sm); font-family: var(--font-mono);">已读</span>
+                <span v-if="isRead(article.id)" class="shrink-0 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap" style="background: var(--color-primary); color: white; border-radius: var(--radius-sm); font-family: var(--font-mono);">{{ t('articleList.read') }}</span>
                 <h2 class="text-base font-semibold truncate" style="color: var(--color-text-primary);">{{ article.title }}</h2>
                 </div>
                 <p class="text-sm line-clamp-2 mb-3" style="color: var(--color-text-secondary); line-height: 1.6;">{{ article.summary }}</p>
@@ -143,20 +141,17 @@
       </div>
     </section>
 
-    <AppFooter />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '@/stores/themeStore'
 import { useArticleStore } from '@/stores/articleStore'
 import { fetchHotTags, fetchTrendingTopics } from '@/api/articles'
 import { fetchLeaderboard } from '@/api/user'
-import AppNavigation from '@/components/layout/AppNavigation.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
 import ArticleFilterSidebar from '@/components/business/ArticleFilterSidebar.vue'
 import { useCardStyles } from '@/hooks/useCardStyles'
 import ListPagination from '@/components/business/ListPagination.vue'
@@ -164,13 +159,14 @@ import EmptyState from '@/components/base/EmptyState.vue'
 import { useReadTracker } from '@/composables/useReadTracker'
 
 const router = useRouter()
+const route = useRoute()
 const themeStore = useThemeStore()
 const articleStore = useArticleStore()
 const { getCardStyle } = useCardStyles()
 const { t } = useI18n()
 
 const searchQuery = ref('')
-const currentCategory = ref<string>('all')
+const currentCategory = ref<string>((route.query.category as string) || 'all')
 
 /** ======== 状态持久化：从 sessionStorage 恢复 ======== */
 const LIST_STATE_KEY = 'article_list_state'
@@ -179,7 +175,8 @@ function restoreListState() {
     const saved = sessionStorage.getItem(LIST_STATE_KEY)
     if (!saved) return
     const state = JSON.parse(saved)
-    if (state.category) currentCategory.value = state.category
+    // URL query 参数优先于持久化状态
+    if (!route.query.category && state.category) currentCategory.value = state.category
     if (state.search) searchQuery.value = state.search
     if (state.page) articleStore.currentPage = state.page
     if (state.pageSize) articleStore.pageSize = state.pageSize
@@ -257,9 +254,14 @@ const defaultTagStyles = {
 }
 
 onMounted(async () => {
-  // 进入页面时用恢复的状态加载文章
+  // 进入页面时用恢复的状态加载文章（含搜索词和分类参数）
   articleStore.currentCategory = currentCategory.value
-  articleStore.loadArticles({ page: articleStore.currentPage, page_size: articleStore.pageSize })
+  const initialParams: Record<string, any> = { page: articleStore.currentPage, page_size: articleStore.pageSize }
+  if (searchQuery.value) {
+    initialParams.search = searchQuery.value
+    articleStore.searchQuery = searchQuery.value
+  }
+  articleStore.loadArticles(initialParams)
   // 刷新分类列表（含实时计数）
   articleStore.loadCategories()
 
@@ -291,11 +293,17 @@ onMounted(async () => {
 const getCatSlug = (cat: any): string =>
   typeof cat === 'string' ? cat : cat?.slug || ''
 
-/** 获取分类名称 */
-const getCategoryName = (cat: any): string =>
-  typeof cat === 'string'
-    ? ({ tech: '科技', game: '游戏', hardware: '硬件', anime: '二次元', ai_robot: 'AI机器人', ai_coding: 'AI编程', godot: 'Godot' }[cat] || cat)
-    : cat?.name || ''
+/** 获取分类名称（通过 i18n 适配多语言） */
+const getCategoryName = (cat: any): string => {
+  const slug = typeof cat === 'string' ? cat : cat?.slug || ''
+  // "全部"特例：后端无 all 分类，直接返回翻译
+  if (slug === 'all') return t('articleList.categories.all')
+  // 尝试从 i18n 获取翻译，key 路径：articleList.categories.{slug}
+  const key = `articleList.categories.${slug}`
+  const translated = t(key)
+  // vue-i18n 无匹配时返回 key 本身，此时回退到 API 返回的 name
+  return translated !== key ? translated : (cat?.name || slug)
+}
 
 const getCategoryColor = (cat: any) => {
   const slug = getCatSlug(cat)

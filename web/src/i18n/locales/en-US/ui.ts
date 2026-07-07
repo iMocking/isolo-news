@@ -3,6 +3,17 @@
  * Organized by domain, mirrors zh-CN structure
  */
 export default {
+  // ==================== Category names (global, keyed by slug) ====================
+  categories: {
+    all: 'All',
+    tech: 'Tech',
+    ai_robot: 'AI Robot',
+    ai_coding: 'AI Coding',
+    hardware: 'Hardware',
+    anime: 'Anime',
+    godot: 'Godot',
+  },
+
   // ==================== Common ====================
   common: {
     all: 'All',
@@ -47,7 +58,8 @@ export default {
     aboutMe: 'About Me',
     profile: 'Profile',
     settings: 'Settings',
-    logout: 'Log Out'
+    logout: 'Log Out',
+    switchTheme: 'Switch Theme'
   },
 
   // ==================== Hero Section ====================
@@ -124,7 +136,12 @@ export default {
       },
       statusCompleted: 'Completed',
       statusNotStarted: 'Not Started',
-      progress: 'Progress {progress}/{target}'
+      progress: 'Progress {progress}/{target}',
+      questTitles: {
+        read_articles: 'Read 3 Articles',
+        login: 'Daily Check-in',
+        comment: 'Comment on an Article'
+      }
     },
     grid: {
       title: {

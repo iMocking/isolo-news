@@ -12,7 +12,9 @@ import (
 	"isolo-news/internal/config"
 	"isolo-news/internal/ent"
 	"isolo-news/internal/ent/article"
+	"isolo-news/internal/ent/category"
 	"isolo-news/internal/ent/source"
+	"isolo-news/internal/service/reader"
 )
 
 // Collector 新闻采集器
@@ -20,6 +22,7 @@ type Collector struct {
 	db        *ent.Client
 	cfg       *config.CollectorConfig
 	fp        *gofeed.Parser
+	rd        *reader.Reader // 全文提取器（RSS 内容不足时自动提取）
 }
 
 // NewCollector 创建采集器
@@ -27,10 +30,20 @@ func NewCollector(db *ent.Client, cfg *config.CollectorConfig) *Collector {
 	fp := gofeed.NewParser()
 	fp.UserAgent = cfg.UserAgent
 
+	// 初始化全文提取器
+	rd := reader.NewReader(reader.Config{
+		Enabled:          cfg.Readability.Enabled,
+		MinContentLength: cfg.Readability.MinContentLength,
+		Timeout:          cfg.Readability.Timeout,
+		Concurrency:      cfg.Readability.Concurrency,
+		UserAgent:        cfg.UserAgent,
+	})
+
 	return &Collector{
 		db:  db,
 		cfg: cfg,
 		fp:  fp,
+		rd:  rd,
 	}
 }
 
@@ -105,9 +118,13 @@ func (c *Collector) CollectFromSource(ctx context.Context, src *ent.Source) (int
 			summary = item.Title
 			content = item.Title
 		}
-		// 截断过长的摘要
+
+		// 截断过长的摘要（按 rune 截断，避免截断中文字符）
 		if len(summary) > 500 {
-			summary = summary[:500]
+			runes := []rune(summary)
+			if len(runes) > 500 {
+				summary = string(runes[:500])
+			}
 		}
 
 		// 计算发布时间
@@ -118,7 +135,7 @@ func (c *Collector) CollectFromSource(ctx context.Context, src *ent.Source) (int
 			publishedAt = item.UpdatedParsed.Unix()
 		}
 
-		// 获取作者
+		// 获取作者（优先使用 RSS 提供的作者）
 		author := src.Name
 		if item.Author != nil && item.Author.Name != "" {
 			author = item.Author.Name
@@ -138,10 +155,28 @@ func (c *Collector) CollectFromSource(ctx context.Context, src *ent.Source) (int
 			imageURL = item.Image.URL
 		}
 
+		// 如果 RSS 提供的内容过短，尝试 Readability 全文提取
+		if c.rd.ShouldExtract(content) {
+			result := c.rd.Extract(ctx, sourceURL)
+			if result.Success {
+				log.Printf("[采集器] Readability 提取成功 [%s]: %d 字",
+					item.Title, len([]rune(result.Content)))
+				content = result.Content
+				summary = result.Summary
+				// 用提取的信息补充缺失字段（RSS 未提供时才覆盖）
+				if imageURL == "" && result.ImageURL != "" {
+					imageURL = result.ImageURL
+				}
+				if result.Byline != "" && author == src.Name {
+					author = result.Byline
+				}
+			}
+		}
+
 		// 估算阅读时间（按中文 300 字/分钟）
-		contentLen := len(item.Content)
+		contentLen := len([]rune(content))
 		if contentLen == 0 {
-			contentLen = len(summary)
+			contentLen = len([]rune(summary))
 		}
 		readTime := contentLen / 300
 		if readTime < 1 {
@@ -212,7 +247,43 @@ func (c *Collector) CollectAll(ctx context.Context) (map[string]int, error) {
 		results[src.Name] = count
 	}
 
+	// 采集完成后更新各分类的文章总数
+	if err := c.UpdateCategoryTotals(ctx); err != nil {
+		log.Printf("[采集器] 更新分类总数失败: %v", err)
+	}
+
 	return results, nil
+}
+
+// UpdateCategoryTotals 更新所有分类的文章总数到数据库
+// 每次采集完成后调用，确保分类 total 值实时准确
+func (c *Collector) UpdateCategoryTotals(ctx context.Context) error {
+	categories, err := c.db.Category.Query().All(ctx)
+	if err != nil {
+		return fmt.Errorf("查询分类列表失败: %w", err)
+	}
+
+	for _, cat := range categories {
+		count, err := c.db.Article.Query().
+			Where(article.CategoryIDEQ(cat.Slug)).
+			Count(ctx)
+		if err != nil {
+			log.Printf("[采集器] 统计分类 [%s] 文章数失败: %v", cat.Slug, err)
+			continue
+		}
+
+		_, err = c.db.Category.Update().
+			Where(category.IDEQ(cat.ID)).
+			SetTotal(count).
+			Save(ctx)
+		if err != nil {
+			log.Printf("[采集器] 更新分类 [%s] total 失败: %v", cat.Slug, err)
+			continue
+		}
+	}
+
+	log.Printf("[采集器] 分类总数更新完成")
+	return nil
 }
 
 // calculateXpReward 根据阅读时间计算 XP 奖励

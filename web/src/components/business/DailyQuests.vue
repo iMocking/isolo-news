@@ -91,6 +91,8 @@ const iconMap: Record<string, any> = {
 const quests = computed(() => {
   return userStore.dailyQuests.map(quest => ({
     ...quest,
+    // 使用 i18n 映射任务标题，回退到 API 返回的原始标题
+    title: quest.questType ? t(`home.quests.questTitles.${quest.questType}`) : quest.title,
     icon: iconMap[quest.icon as string] || BookOpen,
     statusText: quest.status === 'completed' ? t('home.quests.statusCompleted') : 
                 quest.status === 'in_progress' ? t('home.quests.progress', { progress: quest.progress, target: quest.target }) : t('home.quests.statusNotStarted')

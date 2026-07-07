@@ -193,6 +193,7 @@ func (s *UserService) GetQuests(ctx context.Context, userID string) ([]dto.Quest
 			Target:      q.Target,
 			Status:      "not_started",
 			Progress:    0,
+			QuestType:   q.QuestType,
 		}
 
 		if pq, ok := progressMap[q.ID]; ok {
