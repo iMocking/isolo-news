@@ -8,12 +8,20 @@
     </div>
 
     <!-- Comment Input -->
-    <div class="p-4 mb-6" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md);">
+    <div class="p-4 mb-6" :style="commentInputStyle">
       <div class="flex items-start gap-3">
         <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, var(--color-primary-200), var(--color-secondary-100)); border: 1px solid var(--color-border);">
           <span class="text-sm font-bold" style="color: var(--color-text-inverse);">{{ userStore.playerName.charAt(0).toUpperCase() }}</span>
         </div>
         <div class="flex-1">
+          <!-- 错误提示 -->
+          <div v-if="commentError" class="mb-2 px-3 py-2 text-xs font-mono rounded" style="color: #ff4444; background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2);">
+            {{ commentError }}
+          </div>
+          <!-- 成功提示 -->
+          <div v-if="commentSuccess" class="mb-2 px-3 py-2 text-xs font-mono rounded" style="color: #22c55e; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);">
+            {{ commentSuccess }}
+          </div>
           <textarea
             v-model="newComment"
             class="w-full p-3 text-sm outline-none resize-none transition-all duration-150"
@@ -46,7 +54,7 @@
         v-for="comment in comments"
         :key="comment.id"
         class="p-4 transition-all duration-150 hover:translate-y-[-1px]"
-        style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md);"
+        :style="commentCardStyle"
       >
         <div class="flex items-start gap-3">
           <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background: linear-gradient(135deg, var(--color-primary-200), var(--color-secondary-100)); border: 1px solid var(--color-border);">
@@ -75,12 +83,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/userStore'
 import type { CommentVO } from '@/api/articles'
 import { fetchComments, createComment } from '@/api/articles'
 import { Heart, Send, MessageCircle } from 'lucide-vue-next'
+import { useCardStyles } from '@/hooks/useCardStyles'
 
 const props = defineProps<{
   articleId: string
@@ -92,32 +101,54 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const userStore = useUserStore()
+const { getCardStyle } = useCardStyles()
 
 const comments = ref<CommentVO[]>([])
 const newComment = ref('')
+const commentError = ref('')
+const commentSuccess = ref('')
+
+const commentInputStyle = computed(() => getCardStyle('default', false))
+const commentCardStyle = computed(() => getCardStyle('comment', false))
 
 const formatCommentTime = (timestamp: number): string => {
-  if (!timestamp) return '刚刚'
+  if (!timestamp) return t('common.justNow')
   const now = Date.now() / 1000
   const diff = now - timestamp
-  if (diff < 60) return '刚刚'
-  if (diff < 3600) return `${Math.floor(diff / 60)}分钟前`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}小时前`
-  if (diff < 2592000) return `${Math.floor(diff / 86400)}天前`
+  if (diff < 60) return t('common.justNow')
+  if (diff < 3600) return t('common.minutes', { count: Math.floor(diff / 60) })
+  if (diff < 86400) return t('common.hours', { count: Math.floor(diff / 3600) })
+  if (diff < 2592000) return t('common.days', { count: Math.floor(diff / 86400) })
   return new Date(timestamp * 1000).toLocaleDateString()
 }
 
+/** 发表评论 */
 const handleAddComment = async () => {
-  if (!newComment.value.trim() || !userStore.isLoggedIn) return
+  commentError.value = ''
+  commentSuccess.value = ''
+
+  // 内容为空校验
+  if (!newComment.value.trim()) return
+
+  // 登录校验
+  if (!userStore.isLoggedIn) {
+    commentError.value = t('articleDetail.comment.loginRequired')
+    return
+  }
+
   try {
     const res = await createComment(props.articleId, newComment.value)
     if (res.code === 0 && res.data) {
       comments.value.unshift(res.data)
       emit('update:commentCount', comments.value.length)
       newComment.value = ''
+      commentSuccess.value = t('articleDetail.comment.postSuccess')
+      setTimeout(() => { commentSuccess.value = '' }, 3000)
+    } else {
+      commentError.value = res.message || t('articleDetail.comment.postFail')
     }
   } catch {
-    console.warn('发表评论失败')
+    commentError.value = t('common.errors.networkError')
   }
 }
 

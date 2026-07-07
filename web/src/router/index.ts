@@ -58,7 +58,11 @@ const routes: RouteRecordRaw[] = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  /** 每次页面跳转都滚动到顶部 */
+  scrollBehavior() {
+    return { top: 0 }
+  }
 })
 
 /** 路由守卫：受保护页面需登录 */

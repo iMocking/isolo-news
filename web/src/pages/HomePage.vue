@@ -13,7 +13,7 @@
       <TrendingTopics />
 
       <!-- Article Grid with Sidebar -->
-      <ArticleGrid :articles="articles">
+      <ArticleGrid :articles="articles" :empty-type="articleStore.apiOffline ? 'offline' : 'empty'">
         <template #sidebar>
           <PlayerStats />
         </template>

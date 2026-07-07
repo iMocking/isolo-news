@@ -23,7 +23,7 @@
       <div
         v-for="quest in quests"
         :key="quest.id"
-        class="rounded-lg p-5 transition-all duration-160"
+        class="p-5 transition-all duration-160"
         :style="questCardStyle(quest)"
         @mouseenter="handleQuestHover(quest)"
         @mouseleave="handleQuestLeave(quest)"
@@ -67,10 +67,12 @@ import { useThemeStore } from '@/stores/themeStore'
 import { useUserStore } from '@/stores/userStore'
 import { BookOpen, Check, MessageSquare } from 'lucide-vue-next'
 import type { Quest } from '@/types'
+import { useCardStyles } from '@/hooks/useCardStyles'
 
 const { t } = useI18n()
 const themeStore = useThemeStore()
 const userStore = useUserStore()
+const { getCardStyle } = useCardStyles()
 
 const hoveredQuests = ref<Set<string>>(new Set())
 
@@ -116,21 +118,14 @@ const questCardStyle = computed(() => (quest: Quest) => {
   
   if (isCompleted) {
     return {
-      background: `var(--color-bgCard)`,
+      ...getCardStyle('default', false),
       border: '1px solid rgba(0, 255, 136, 0.15)',
       opacity: 0.7
     }
   } else if (quest.status === 'in_progress') {
-    return {
-      background: `var(--color-bgCard)`,
-      border: '1px solid var(--color-border)',
-      boxShadow: isHovered ? '0 0 16px rgba(0, 240, 255, 0.06)' : 'none'
-    }
+    return getCardStyle('default', isHovered)
   } else {
-    return {
-      background: `var(--color-bgCard)`,
-      border: isHovered ? '1px solid var(--color-border)' : '1px solid var(--color-borderSubtle)'
-    }
+    return getCardStyle('default', isHovered)
   }
 })
 

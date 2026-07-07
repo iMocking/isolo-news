@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-lg p-5" :style="panelStyle">
+  <div class="p-5" :style="panelStyle">
     <!-- Header -->
     <div class="flex items-center gap-2 mb-5">
       <component :is="headerIcon" class="w-4 h-4" :style="iconStyle" />
@@ -48,10 +48,18 @@
     <!-- Player Info -->
     <div class="flex items-center gap-3 mt-4">
       <div
-        class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+        class="w-10 h-10 rounded-full overflow-hidden shrink-0"
         :style="avatarStyle"
       >
-        {{ avatarText }}
+        <img
+          v-if="userStore.isLoggedIn"
+          :src="userAvatar"
+          :alt="playerName"
+          class="w-full h-full object-cover"
+        />
+        <span v-else class="text-sm font-bold w-full h-full flex items-center justify-center" :style="{ color: 'var(--color-textPrimary)' }">
+          {{ avatarText }}
+        </span>
       </div>
       <div class="min-w-0 flex-1">
         <div class="text-sm font-medium truncate" :style="playerNameStyle">
@@ -71,10 +79,12 @@ import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '@/stores/themeStore'
 import { useUserStore } from '@/stores/userStore'
 import { BarChart3 } from 'lucide-vue-next'
+import { useCardStyles } from '@/hooks/useCardStyles'
 
 const { t, tm } = useI18n()
 const themeStore = useThemeStore()
 const userStore = useUserStore()
+const { getCardStyle } = useCardStyles()
 
 const theme = computed(() => themeStore.currentTheme)
 
@@ -85,16 +95,16 @@ const headerIcon = computed(() => BarChart3)
 const stats = computed(() => {
   const statNames = tm(`home.player.statsName.${theme.value}`) as unknown as string[]
   return [
-    { label: statNames[0], value: theme.value === 'ironcore' ? userStore.readArticles : userStore.readArticles, colorType: 'primary' },
-    { label: statNames[1], value: theme.value === 'ironcore' ? 'S+' : userStore.achievements.length, colorType: 'secondary' },
-    { label: statNames[2], value: theme.value === 'ironcore' ? '87%' : userStore.loginDays, colorType: 'success' },
-    { label: statNames[3], value: theme.value === 'ironcore' ? '2,450' : `#${userStore.rank}`, colorType: 'warning' }
+    { label: statNames[0], value: userStore.readArticles, colorType: 'primary' },
+    { label: statNames[1], value: userStore.achievements.length, colorType: 'secondary' },
+    { label: statNames[2], value: userStore.loginDays, colorType: 'success' },
+    { label: statNames[3], value: `#${userStore.rank}`, colorType: 'warning' }
   ]
 })
 
 const userLevel = computed(() => userStore.level)
 const currentXP = computed(() => userStore.xp)
-const maxXP = computed(() => 5000)
+const maxXP = computed(() => userStore.maxXp)
 const playerName = computed(() => t(`profile.playerName.${theme.value}`))
 
 const playerTitle = computed(() => t(`profile.playerTitle.${theme.value}`))
@@ -108,10 +118,22 @@ const avatarText = computed(() => {
   return texts[themeStore.currentTheme]
 })
 
-const panelStyle = computed(() => ({
-  background: `var(--color-bgCard)`,
-  border: `1px solid var(--color-border)`
-}))
+const defaultAvatar = computed(() => {
+  const avatars: Record<string, string> = {
+    nexus: '/images/image_1_yi19x4.jpg',
+    comiket: '/images/image_3_yi19x4.jpg',
+    ironcore: '/images/image_5_yi19x4.jpg'
+  }
+  return avatars[themeStore.currentTheme] || avatars.nexus
+})
+
+const userAvatar = computed(() => {
+  return userStore.currentUser?.avatarUrl || defaultAvatar.value
+})
+
+const panelStyle = computed(() => {
+  return getCardStyle('elevated')
+})
 
 const iconStyle = computed(() => ({
   color: `var(--color-primary)`
@@ -174,6 +196,7 @@ const scanlineStyle = computed(() => ({
 
 const avatarStyle = computed(() => ({
   background: `linear-gradient(135deg, var(--color-primaryDark), var(--color-secondaryDark))`,
+  border: `2px solid var(--color-primary)`,
   color: `var(--color-textPrimary)`
 }))
 
@@ -182,7 +205,6 @@ const playerNameStyle = computed(() => ({
 }))
 
 const playerTitleStyle = computed(() => ({
-  fontFamily: `var(--font-mono)`,
-  color: `var(--color-textTertiary)`
+  color: `var(--color-textSecondary)`
 }))
 </script>

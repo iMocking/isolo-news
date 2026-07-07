@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { Bell, User, Palette, EyeOff, Shield, ChevronRight, Check, X } from 'lucide-vue-next'
+import { Bell, Palette, EyeOff, Shield } from 'lucide-vue-next'
 import NotificationToggles from '@/components/business/NotificationToggles.vue'
+import ProfileEditCard from '@/components/profile/ProfileEditCard.vue'
+import SystemInfoCard from '@/components/profile/SystemInfoCard.vue'
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseCard from '@/components/base/BaseCard.vue'
-import BaseButton from '@/components/base/BaseButton.vue'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import { useThemeStore } from '@/stores/themeStore'
 import { useUserStore } from '@/stores/userStore'
+import { useCardStyles } from '@/hooks/useCardStyles'
 import { updateProfile } from '@/api/user'
 
 const { t } = useI18n()
 const themeStore = useThemeStore()
 const userStore = useUserStore()
+const { getCardStyle } = useCardStyles()
 
 const notifications = ref({
   push: true,
@@ -21,294 +24,239 @@ const notifications = ref({
   inApp: false
 })
 
+const systemPrefs = ref({
+  compactMode: false,
+  reducedMotion: false,
+  highContrast: false
+})
+
 const themes = ['nexus', 'comiket', 'ironcore']
 
 const selectTheme = (theme: string) => {
   themeStore.setTheme(theme as any)
-  // 同步主题偏好到后端
   if (userStore.isLoggedIn) {
-    updateProfile({ themePreference: theme }).catch(() => {})
-  }
-}
-
-// 个人资料编辑
-const showEditForm = ref(false)
-const editName = ref(userStore.playerName)
-const editTitle = ref(userStore.title)
-const editTagsText = ref(userStore.tags.join(', '))
-const saveMessage = ref('')
-const isSaving = ref(false)
-const toggleEditForm = () => {
-  showEditForm.value = !showEditForm.value
-  if (showEditForm.value) {
-    editName.value = userStore.playerName
-    editTitle.value = userStore.title
-    editTagsText.value = userStore.tags.join(', ')
-    saveMessage.value = ''
-  }
-}
-
-const handleSaveProfile = async () => {
-  if (!editName.value.trim()) { saveMessage.value = '昵称不能为空'; return }
-  isSaving.value = true
-  saveMessage.value = ''
-  try {
-    const tags = editTagsText.value.split(',').map((t) => t.trim()).filter(Boolean)
-    const res = await updateProfile({
-      playerName: editName.value.trim(),
-      title: editTitle.value.trim(),
-      tags,
+    updateProfile({ themePreference: theme }).catch((err) => {
+      console.warn('[Settings] 主题保存失败:', err)
     })
-    if (res.code === 0) {
-      saveMessage.value = '保存成功 ✓'
-      showEditForm.value = false
-      // 刷新用户数据
-      await userStore.refreshUserData()
-    } else {
-      saveMessage.value = res.message || '保存失败'
-    }
-  } catch {
-    saveMessage.value = '网络错误，请稍后重试'
-  } finally {
-    isSaving.value = false
   }
 }
-const pageSubtitle = computed(() => t('settings.subtitle'))
+
+const theme = computed(() => themeStore.currentTheme)
+
+const pageTitle = computed(() => {
+  const titles: Record<string, string> = {
+    nexus: 'SYSTEM CONFIG',
+    comiket: '系统配置',
+    ironcore: 'COMMAND CONFIG'
+  }
+  return titles[theme.value] || titles.nexus
+})
+
+const pageTag = computed(() => {
+  const tags: Record<string, string> = {
+    nexus: '// 系统参数调整',
+    comiket: '// 个性化设置',
+    ironcore: '// 作战参数配置'
+  }
+  return tags[theme.value] || tags.nexus
+})
+
+const pageSubtitle = computed(() => {
+  const subtitles: Record<string, string> = {
+    nexus: '调整系统参数、通知偏好与个人资料',
+    comiket: '个性化你的阅读体验与界面主题',
+    ironcore: '配置作战参数与系统偏好'
+  }
+  return subtitles[theme.value] || subtitles.nexus
+})
+
+const themeLabels: Record<string, string> = {
+  nexus: t('settings.theme.nexus'),
+  comiket: t('settings.theme.comiket'),
+  ironcore: t('settings.theme.ironcore')
+}
+
+const systemInfo = [
+  { icon: 'monitor', label: t('settings.system.clientVersion'), value: 'v2.4.0' },
+  { icon: 'globe', label: t('settings.system.locale'), value: 'zh-CN' },
+  { icon: 'database', label: t('settings.system.dataSync'), value: t('settings.system.connected') },
+  { icon: 'hard-drive', label: t('settings.system.localCache'), value: '128 MB' }
+]
 </script>
 
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen" :style="{ background: 'var(--color-bgPrimary)' }">
     <AppNavigation />
-    
-    <!-- Settings Content -->
-    <div class="max-w-2xl mx-auto px-6 pt-24 pb-16">
-      <!-- Page Title -->
-      <div class="flex items-center gap-3 mb-8">
-        <span
-          class="w-3 h-3 rounded-sm"
-          style="background: var(--color-primary); box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);"
+
+    <main class="max-w-3xl mx-auto px-6 pt-24 pb-16">
+      <!-- Header -->
+      <section class="relative overflow-hidden rounded-2xl mb-10 p-8" :style="getCardStyle('panel', false)">
+        <div class="relative z-10">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="w-3 h-3 rounded-sm" :style="{ background: 'var(--color-primary)', boxShadow: '0 0 12px var(--color-primary200)' }" />
+            <h1 class="text-2xl md:text-3xl font-bold tracking-wider" :style="{ fontFamily: 'var(--font-display)', color: 'var(--color-textPrimary)' }">
+              {{ pageTitle }}
+            </h1>
+          </div>
+          <p class="text-sm mb-3" :style="{ color: 'var(--color-textSecondary)', lineHeight: 1.7, maxWidth: '520px' }">
+            {{ pageSubtitle }}
+          </p>
+          <span class="text-xs font-mono" :style="{ color: 'var(--color-primary)' }">{{ pageTag }}</span>
+        </div>
+        <div
+          class="absolute top-0 right-0 w-1/2 h-full pointer-events-none opacity-20"
+          :style="{ background: 'radial-gradient(circle at 80% 20%, var(--color-primary), transparent 60%)' }"
         />
-        <h1
-          class="text-2xl font-bold"
-          style="font-family: var(--font-display); color: var(--color-text-primary);"
-        >
-          SYSTEM CONFIG
-        </h1>
-        <span
-          class="text-sm"
-          style="color: var(--color-text-tertiary);"
-        >
-          {{ pageSubtitle }}
-        </span>
-      </div>
+      </section>
 
       <!-- Settings Cards -->
       <div class="space-y-4">
-        <!-- Notification Settings -->
-        <BaseCard padding="md">
-          <div class="flex items-center gap-3 mb-4">
-            <div
-              class="w-8 h-8 rounded-md flex items-center justify-center"
-              style="background: var(--color-primary-50); border: 1px solid var(--color-border);"
-            >
-              <Bell class="w-4 h-4" style="color: var(--color-primary);" />
-            </div>
-              <h3
-                class="text-sm font-semibold"
-                style="color: var(--color-text-primary);"
-              >
-                {{ t('settings.notifications.title') }}
-              </h3>
-            <span
-              class="text-[10px] ml-auto"
-              style="font-family: var(--font-mono); color: var(--color-text-tertiary);"
-            >
-              NOTIFICATION
-            </span>
-          </div>
-          <NotificationToggles
-            v-model="notifications"
-            :items="[
-              { key: 'push', label: t('settings.notifications.push') },
-              { key: 'email', label: t('settings.notifications.email') },
-              { key: 'inApp', label: t('settings.notifications.inApp') },
-            ]" />
-        </BaseCard>
-
-        <!-- Profile Edit -->
-        <BaseCard padding="md">
-          <div
-            class="flex items-center gap-3 cursor-pointer"
-            @click="toggleEditForm"
-          >
-            <div
-              class="w-8 h-8 rounded-md flex items-center justify-center"
-              style="background: var(--color-primary-50); border: 1px solid var(--color-border);"
-            >
-              <User class="w-4 h-4" style="color: var(--color-primary);" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <h3
-                class="text-sm font-semibold"
-                style="color: var(--color-text-primary);"
-              >
-                {{ t('settings.profileEdit.title') }}
-              </h3>
-              <p
-                class="text-xs mt-0.5"
-                style="color: var(--color-text-tertiary);"
-              >
-                {{ userStore.playerName }} · {{ userStore.title }}
-              </p>
-            </div>
-            <ChevronRight class="w-4 h-4" style="color: var(--color-text-tertiary);" />
-          </div>
-
-          <!-- 编辑表单 -->
-          <div v-if="showEditForm" class="mt-4 ml-11 space-y-3">
-            <div>
-              <label class="block text-xs mb-1" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">昵称</label>
-              <input
-                v-model="editName"
-                type="text"
-                class="w-full px-3 py-2 text-sm outline-none"
-                style="background: var(--color-bg-primary); border: 1px solid var(--color-border); color: var(--color-text-primary); border-radius: var(--radius-sm);"
-              />
-            </div>
-            <div>
-              <label class="block text-xs mb-1" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">头衔</label>
-              <input
-                v-model="editTitle"
-                type="text"
-                class="w-full px-3 py-2 text-sm outline-none"
-                style="background: var(--color-bg-primary); border: 1px solid var(--color-border); color: var(--color-text-primary); border-radius: var(--radius-sm);"
-              />
-            </div>
-            <div>
-              <label class="block text-xs mb-1" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">标签（逗号分隔）</label>
-              <input
-                v-model="editTagsText"
-                type="text"
-                class="w-full px-3 py-2 text-sm outline-none"
-                style="background: var(--color-bg-primary); border: 1px solid var(--color-border); color: var(--color-text-primary); border-radius: var(--radius-sm);"
-              />
-            </div>
-            <div v-if="saveMessage" class="text-xs" :style="{ color: saveMessage.includes('成功') ? 'var(--state-success)' : 'var(--state-error)' }">
-              {{ saveMessage }}
-            </div>
-            <div class="flex gap-2">
-              <BaseButton size="sm" variant="primary" :disabled="isSaving" @click="handleSaveProfile">
-                <template v-if="isSaving">保存中...</template>
-                <template v-else><Check class="w-3 h-3" /> 保存</template>
-              </BaseButton>
-              <BaseButton size="sm" variant="ghost" @click="toggleEditForm">
-                <X class="w-3 h-3" /> 取消
-              </BaseButton>
-            </div>
-          </div>
-        </BaseCard>
-
         <!-- Theme Select -->
         <BaseCard padding="md">
-          <div class="flex items-center gap-3 mb-4">
+          <div class="flex items-center gap-3 mb-5">
             <div
               class="w-8 h-8 rounded-md flex items-center justify-center"
-              style="background: var(--color-primary-50); border: 1px solid var(--color-border);"
+              :style="{ background: 'var(--color-primary50)', border: '1px solid var(--color-border)' }"
             >
-              <Palette class="w-4 h-4" style="color: var(--color-primary);" />
+              <Palette class="w-4 h-4" :style="{ color: 'var(--color-primary)' }" />
             </div>
-              <h3
-                class="text-sm font-semibold"
-                style="color: var(--color-text-primary);"
-              >
-                {{ t('settings.theme.title') }}
-              </h3>
-            <span
-              class="text-[10px] ml-auto"
-              style="font-family: var(--font-mono); color: var(--color-text-tertiary);"
-            >
+            <h3 class="text-sm font-semibold" :style="{ color: 'var(--color-textPrimary)' }">
+              {{ t('settings.theme.title') }}
+            </h3>
+            <span class="text-[10px] ml-auto font-mono" :style="{ color: 'var(--color-textTertiary)' }">
               THEME
             </span>
           </div>
-          <div class="flex gap-2 ml-11">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 ml-11">
             <button
-              v-for="theme in themes"
-              :key="theme"
-              class="px-4 py-2 text-xs font-semibold rounded-md transition-all duration-150"
+              v-for="themeItem in themes"
+              :key="themeItem"
+              class="px-3 py-3 text-xs font-semibold rounded-md transition-all duration-150 text-left"
               :style="{
-                background: themeStore.currentTheme === theme ? 'var(--color-primary-50)' : 'transparent',
-                border: themeStore.currentTheme === theme ? '1px solid var(--color-primary)' : '1px solid var(--color-border-subtle)',
-                color: themeStore.currentTheme === theme ? 'var(--color-primary)' : 'var(--color-text-tertiary)',
+                background: themeStore.currentTheme === themeItem ? 'var(--color-primary50)' : 'transparent',
+                border: themeStore.currentTheme === themeItem ? '1px solid var(--color-primary)' : '1px solid var(--color-borderSubtle)',
+                color: themeStore.currentTheme === themeItem ? 'var(--color-primary)' : 'var(--color-textTertiary)',
                 fontFamily: 'var(--font-mono)'
               }"
-              @click="selectTheme(theme)"
+              @click="selectTheme(themeItem)"
             >
-              {{ theme.toUpperCase() }}
+              <span class="block text-[10px] opacity-70 mb-0.5">{{ themeItem.toUpperCase() }}</span>
+              {{ themeLabels[themeItem] }}
             </button>
           </div>
         </BaseCard>
 
+        <!-- Notification Settings -->
+        <BaseCard padding="md">
+          <div class="flex items-center gap-3 mb-5">
+            <div
+              class="w-8 h-8 rounded-md flex items-center justify-center"
+              :style="{ background: 'var(--color-primary50)', border: '1px solid var(--color-border)' }"
+            >
+              <Bell class="w-4 h-4" :style="{ color: 'var(--color-primary)' }" />
+            </div>
+            <h3 class="text-sm font-semibold" :style="{ color: 'var(--color-textPrimary)' }">
+              {{ t('settings.notifications.title') }}
+            </h3>
+            <span class="text-[10px] ml-auto font-mono" :style="{ color: 'var(--color-textTertiary)' }">
+              NOTIFICATION
+            </span>
+          </div>
+          <div class="ml-11">
+            <NotificationToggles
+              v-model="notifications"
+              :items="[
+                { key: 'push', label: t('settings.notifications.push') },
+                { key: 'email', label: t('settings.notifications.email') },
+                { key: 'inApp', label: t('settings.notifications.inApp') },
+              ]" />
+          </div>
+        </BaseCard>
+
+        <!-- 个人信息编辑（折叠卡片） -->
+        <ProfileEditCard />
+
+        <!-- System Preferences -->
+        <BaseCard padding="md">
+          <div class="flex items-center gap-3 mb-5">
+            <div
+              class="w-8 h-8 rounded-md flex items-center justify-center"
+              :style="{ background: 'var(--color-secondary50)', border: '1px solid var(--color-border)' }"
+            >
+              <Monitor class="w-4 h-4" :style="{ color: 'var(--color-secondary)' }" />
+            </div>
+            <h3 class="text-sm font-semibold" :style="{ color: 'var(--color-textPrimary)' }">
+               {{ t('settings.system.title') }}
+            </h3>
+            <span class="text-[10px] ml-auto font-mono" :style="{ color: 'var(--color-textTertiary)' }">
+              PREFERENCE
+            </span>
+          </div>
+          <div class="ml-11 space-y-3">
+            <label
+              v-for="(value, key) in systemPrefs"
+              :key="key"
+              class="flex items-center justify-between cursor-pointer"
+            >
+              <span class="text-sm" :style="{ color: 'var(--color-textSecondary)' }">
+                {{ key === 'compactMode' ? t('settings.system.compactMode') : key === 'reducedMotion' ? t('settings.system.reduceAnimation') : t('settings.system.highContrast') }}
+              </span>
+              <input
+                v-model="systemPrefs[key as keyof typeof systemPrefs]"
+                type="checkbox"
+                class="w-4 h-4"
+                :style="{ accentColor: 'var(--color-primary)' }"
+              />
+            </label>
+          </div>
+        </BaseCard>
+
         <!-- Privacy Settings -->
-        <BaseCard
-          padding="md"
-          clickable
-        >
+        <BaseCard padding="md" clickable>
           <div class="flex items-center gap-3">
             <div
               class="w-8 h-8 rounded-md flex items-center justify-center"
-              style="background: var(--color-secondary-50); border: 1px solid var(--color-border);"
+              :style="{ background: 'var(--color-secondary50)', border: '1px solid var(--color-border)' }"
             >
-              <EyeOff class="w-4 h-4" style="color: var(--color-secondary);" />
+              <EyeOff class="w-4 h-4" :style="{ color: 'var(--color-secondary)' }" />
             </div>
             <div class="flex-1 min-w-0">
-              <h3
-                class="text-sm font-semibold"
-                style="color: var(--color-text-primary);"
-              >
+              <h3 class="text-sm font-semibold" :style="{ color: 'var(--color-textPrimary)' }">
                 {{ t('settings.privacy.title') }}
               </h3>
-              <p
-                class="text-xs mt-0.5"
-                style="color: var(--color-text-tertiary);"
-              >
+              <p class="text-xs mt-0.5" :style="{ color: 'var(--color-textTertiary)' }">
                 {{ t('settings.privacy.desc') }}
               </p>
             </div>
-            <ChevronRight class="w-4 h-4" style="color: var(--color-text-tertiary);" />
+            <ChevronRight class="w-4 h-4" :style="{ color: 'var(--color-textTertiary)' }" />
           </div>
         </BaseCard>
 
         <!-- Account Security -->
-        <BaseCard
-          padding="md"
-          clickable
-        >
+        <BaseCard padding="md" clickable>
           <div class="flex items-center gap-3">
             <div
               class="w-8 h-8 rounded-md flex items-center justify-center"
-              style="background: var(--color-state-success-50, rgba(0,255,136,0.08)); border: 1px solid var(--color-border);"
+              :style="{ background: 'var(--color-state-success-50, rgba(0,255,136,0.08))', border: '1px solid var(--color-border)' }"
             >
-              <Shield class="w-4 h-4" style="color: var(--color-state-success);" />
+              <Shield class="w-4 h-4" :style="{ color: 'var(--state-success)' }" />
             </div>
             <div class="flex-1 min-w-0">
-              <h3
-                class="text-sm font-semibold"
-                style="color: var(--color-text-primary);"
-              >
+              <h3 class="text-sm font-semibold" :style="{ color: 'var(--color-textPrimary)' }">
                 {{ t('settings.security.title') }}
               </h3>
-              <p
-                class="text-xs mt-0.5"
-                style="color: var(--color-text-tertiary);"
-              >
+              <p class="text-xs mt-0.5" :style="{ color: 'var(--color-textTertiary)' }">
                 {{ t('settings.security.desc') }}
               </p>
             </div>
-            <ChevronRight class="w-4 h-4" style="color: var(--color-text-tertiary);" />
+            <ChevronRight class="w-4 h-4" :style="{ color: 'var(--color-textTertiary)' }" />
           </div>
         </BaseCard>
+
+        <!-- 系统信息 -->
+        <SystemInfoCard :items="systemInfo" />
       </div>
-    </div>
+    </main>
     <AppFooter />
   </div>
 </template>

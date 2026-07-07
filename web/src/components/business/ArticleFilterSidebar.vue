@@ -1,7 +1,7 @@
 <template>
   <aside class="hidden lg:block w-72 shrink-0 space-y-6">
     <!-- Filter Panel -->
-    <div class="p-5" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md);">
+    <div class="p-5" :style="sidebarPanelStyle">
       <h3 class="text-sm font-semibold mb-4" style="font-family: var(--font-display); color: var(--color-primary);">筛选条件</h3>
       <div class="space-y-3">
         <div>
@@ -34,7 +34,7 @@
     </div>
 
     <!-- Hot Tags -->
-    <div class="p-5" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md);">
+    <div class="p-5" :style="sidebarPanelStyle">
       <h3 class="text-sm font-semibold mb-4" style="font-family: var(--font-display); color: var(--color-primary);">热门标签</h3>
       <div class="flex flex-wrap gap-2">
         <span v-for="tag in hotTags" :key="tag.name" class="px-2.5 py-1 text-xs whitespace-nowrap transition-all duration-150" :style="{
@@ -48,7 +48,7 @@
     </div>
 
     <!-- Weekly Leaderboard -->
-    <div class="p-5" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md);">
+    <div class="p-5" :style="sidebarPanelStyle">
       <h3 class="text-sm font-semibold mb-4" style="font-family: var(--font-display); color: var(--color-primary);">本周排行</h3>
       <div class="space-y-3">
         <div v-for="(item, index) in leaderboard" :key="index" class="flex items-center gap-3 group cursor-pointer">
@@ -67,6 +67,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useCardStyles } from '@/hooks/useCardStyles'
+
 defineProps<{
   categories: Array<{ id: string; name: string; count: number }>
   currentCategory: string
@@ -77,6 +80,10 @@ defineProps<{
 defineEmits<{
   'update:currentCategory': [value: string]
 }>()
+
+const { getCardStyle } = useCardStyles()
+
+const sidebarPanelStyle = computed(() => getCardStyle('panel', false))
 
 const getLeaderboardColor = (index: number) => {
   const colors = ['var(--color-primary)', 'var(--color-secondary)', 'var(--color-state-info)', 'var(--color-state-warning)', 'var(--color-bg-elevated)']

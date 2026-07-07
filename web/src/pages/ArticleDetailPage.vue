@@ -4,17 +4,37 @@
 
     <!-- Article Hero -->
     <section class="w-full relative overflow-hidden" style="background: linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-card) 100%);">
-      <!-- Scanline overlay for NEXUS theme -->
       <div v-if="themeStore.currentTheme === 'nexus'" class="absolute inset-0 pointer-events-none opacity-5" style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--color-text-primary) 2px, var(--color-text-primary) 3px);"></div>
 
+      <!-- 加载中状态 -->
+      <div v-if="articleLoading && !currentArticle" class="max-w-7xl mx-auto px-6 pt-24 pb-10 relative z-10">
+        <div class="flex flex-col items-center justify-center py-20">
+          <div class="w-8 h-8 border-2 rounded-full animate-spin" style="border-color: var(--color-text-tertiary); border-top-color: var(--color-primary);"></div>
+          <p class="mt-4 text-sm" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">{{ $t('common.loading') }}</p>
+        </div>
+      </div>
+
+      <!-- 错误状态 -->
+      <div v-else-if="loadError && !currentArticle" class="max-w-7xl mx-auto px-6 pt-24 pb-10 relative z-10">
+        <div class="flex flex-col items-center justify-center py-20">
+          <p class="text-sm mb-4" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">⚠ {{ $t('common.errors.networkError') }}</p>
+          <router-link to="/list" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium transition-all duration-150"
+            :style="{ background: 'var(--color-primary50)', color: 'var(--color-primary)', border: '1px solid var(--color-primary)', borderRadius: 'var(--radius-sm)' }">
+            <ArrowLeft class="w-3 h-3" />
+            <span>{{ $t('articleDetail.backToList') }}</span>
+          </router-link>
+        </div>
+      </div>
+
+      <!-- 文章已加载 -->
       <div v-if="currentArticle" class="max-w-7xl mx-auto px-6 pt-24 pb-10 relative z-10">
         <!-- Breadcrumb -->
         <div class="flex items-center gap-2 mb-8">
-          <router-link to="/" class="text-xs whitespace-nowrap transition-colors duration-150" style="color: var(--color-text-tertiary);" @mouseenter="($event.target as HTMLElement).style.color = 'var(--color-primary)'" @mouseleave="($event.target as HTMLElement).style.color = 'var(--color-text-tertiary)'">首页</router-link>
+          <router-link to="/" class="text-xs whitespace-nowrap transition-colors duration-150" style="color: var(--color-text-tertiary);" @mouseenter="($event.target as HTMLElement).style.color = 'var(--color-primary)'" @mouseleave="($event.target as HTMLElement).style.color = 'var(--color-text-tertiary)'">{{ $t('articleDetail.breadcrumb.home') }}</router-link>
           <span class="text-xs" style="color: var(--color-text-tertiary);">/</span>
-          <router-link to="/list" class="text-xs whitespace-nowrap transition-colors duration-150" style="color: var(--color-text-tertiary);" @mouseenter="($event.target as HTMLElement).style.color = 'var(--color-primary)'" @mouseleave="($event.target as HTMLElement).style.color = 'var(--color-text-tertiary)'">科技资讯</router-link>
+          <router-link to="/list" class="text-xs whitespace-nowrap transition-colors duration-150" style="color: var(--color-text-tertiary);" @mouseenter="($event.target as HTMLElement).style.color = 'var(--color-primary)'" @mouseleave="($event.target as HTMLElement).style.color = 'var(--color-text-tertiary)'">{{ $t('articleDetail.breadcrumb.list') }}</router-link>
           <span class="text-xs" style="color: var(--color-text-tertiary);">/</span>
-          <span class="text-xs whitespace-nowrap" style="color: var(--color-text-secondary);">任务详情</span>
+          <span class="text-xs whitespace-nowrap" style="color: var(--color-text-secondary);">{{ $t('articleDetail.breadcrumb.current') }}</span>
         </div>
 
         <!-- Category badge -->
@@ -40,22 +60,23 @@
           </div>
           <div class="flex items-center gap-1">
             <Eye class="w-4 h-4" style="color: var(--color-text-tertiary);" />
-            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">阅读 {{ currentArticle.readTime * 1000 }}</span>
+            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">{{ $t('articleDetail.readTime', { count: currentArticle.readTime }) }}</span>
           </div>
         </div>
 
         <!-- XP Progress Bar -->
         <div class="mb-8 p-4 max-w-2xl" style="background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium whitespace-nowrap" style="color: var(--color-primary); font-family: var(--font-display);">XP 奖励进度</span>
+            <span class="text-xs font-medium whitespace-nowrap" style="color: var(--color-primary); font-family: var(--font-display);">{{ $t('articleDetail.xpProgress') }}</span>
             <span class="text-xs whitespace-nowrap" style="color: var(--color-text-secondary);">+{{ currentArticle.xpReward }} XP</span>
           </div>
           <div class="w-full h-2 rounded-full overflow-hidden" style="background: var(--color-bg-tertiary);">
             <div class="h-full rounded-full transition-all duration-300" :style="{ width: `${readProgress}%`, background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))' }"></div>
           </div>
           <div class="flex items-center justify-between mt-2">
-            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">阅读进度 {{ readProgress }}%</span>
-            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">读完可获得 +500 XP</span>
+            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">{{ $t('articleDetail.readProgress', { progress: readProgress }) }}</span>
+            <span v-if="!xpClaimed" class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">{{ $t('articleDetail.readReward', { xp: currentArticle.xpReward }) }}</span>
+            <span v-else class="text-xs font-semibold whitespace-nowrap" style="color: var(--color-primary);">+{{ xpGained || currentArticle.xpReward }} XP ✓</span>
           </div>
         </div>
 
@@ -63,9 +84,6 @@
         <div class="flex flex-wrap gap-2">
           <span v-for="tag in articleTags" :key="tag" class="inline-flex items-center px-3 py-1 text-xs whitespace-nowrap" style="background: var(--color-bg-elevated); color: var(--color-text-secondary); border: 1px solid var(--color-border-subtle);">{{ tag }}</span>
         </div>
-      </div>
-      <div v-else class="max-w-7xl mx-auto px-6 pt-12 pb-10 relative z-10">
-        <p style="color: var(--color-text-secondary);">加载中...</p>
       </div>
     </section>
 
@@ -88,8 +106,8 @@
             <div v-if="themeStore.currentTheme === 'nexus'" class="absolute inset-0 pointer-events-none opacity-[0.03] z-10" style="background: repeating-linear-gradient(0deg, transparent, transparent 1px, var(--color-text-primary) 1px, var(--color-text-primary) 2px); border-radius: var(--radius-lg);"></div>
 
             <!-- Article text body - 动态渲染 API 返回的 content -->
-            <div class="relative z-10 p-6 md:p-10" style="font-size: 15px; line-height: 1.7; color: var(--color-text-primary);">
-              <div v-if="currentArticle.content" v-html="currentArticle.content" />
+            <div class="article-content relative z-10 p-6 md:p-10" style="font-size: 15px; color: var(--color-text-primary);">
+              <div v-if="currentArticle.content" style="display:contents" v-html="currentArticle.content" />
               <div v-else class="py-8 text-center">
                 <div class="inline-block w-5 h-5 border-2 rounded-full animate-spin" style="border-color: var(--color-text-tertiary); border-top-color: var(--color-primary);"></div>
                 <p class="mt-3 text-xs" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">LOADING_CONTENT...</p>
@@ -114,15 +132,15 @@
                 <span class="text-lg font-bold" style="color: var(--color-text-inverse);">A</span>
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-sm font-semibold truncate" style="color: var(--color-text-primary);">量子记者 · Alice</p>
-                <p class="text-xs mt-1 line-clamp-2" style="color: var(--color-text-tertiary);">资深科技记者，专注AI与游戏产业交叉领域。曾报道多届E3与TGS，对技术趋势有独到见解。</p>
+                <p class="text-sm font-semibold truncate" style="color: var(--color-text-primary);">{{ currentArticle.author || $t('articleDetail.authorBio') }}</p>
+                <p class="text-xs mt-1 line-clamp-2" style="color: var(--color-text-tertiary);">{{ $t('articleDetail.authorDesc') }}</p>
               </div>
             </div>
 
             <!-- Back button -->
             <router-link to="/list" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-all duration-150" style="background: var(--color-primary-50); color: var(--color-primary); border: 1px solid var(--color-border);" @mouseenter="($event.target as HTMLElement).style.background = 'var(--color-primary-100)'; ($event.target as HTMLElement).style.transform = 'translateY(-1px)'" @mouseleave="($event.target as HTMLElement).style.background = 'var(--color-primary-50)'; ($event.target as HTMLElement).style.transform = 'translateY(0)'">
               <ArrowLeft class="w-4 h-4" />
-              <span>返回任务列表</span>
+              <span>{{ $t('articleDetail.backToList') }}</span>
             </router-link>
           </div>
 
@@ -142,8 +160,10 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useThemeStore } from '@/stores/themeStore'
 import { useArticleStore } from '@/stores/articleStore'
-import { fetchArticleById } from '@/api/articles'
+import { useUserStore } from '@/stores/userStore'
+import { fetchArticleById, recordRead } from '@/api/articles'
 import { Eye, ArrowLeft } from 'lucide-vue-next'
+import { useReadTracker } from '@/composables/useReadTracker'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import ArticleComments from '@/components/business/ArticleComments.vue'
@@ -152,13 +172,20 @@ import ArticleSidebar from '@/components/business/ArticleSidebar.vue'
 const route = useRoute()
 const themeStore = useThemeStore()
 const articleStore = useArticleStore()
+const userStore = useUserStore()
 
 const readProgress = ref(0)
+const xpClaimed = ref(false)    // 是否已领取阅读 XP
+const xpGained = ref(0)         // 本次阅读获得的 XP
 const commentCount = ref(0)
 const articleId = computed(() => route.params.id as string)
+const articleLoading = ref(true) // 是否正在加载
+const loadError = ref(false)     // 加载是否失败
+const { markAsRead } = useReadTracker()
 
+/** 当前文章：仅在 store 中找到对应 ID 时才返回，避免刷新生效时错误展示 loading */
 const currentArticle = computed(() => {
-  return articleStore.articles.find(a => a.id === articleId.value) || articleStore.articles[0]
+  return articleStore.articles.find(a => a.id === articleId.value) || null
 })
 
 const articleTags = computed(() => currentArticle.value.tags || [])
@@ -202,10 +229,24 @@ const getCategoryBorder = (category: string) => {
   return colors[category] || 'var(--color-primary-200)'
 }
 
-let progressInterval: number | undefined
+/** 阅读进度达到 90% 时上报阅读+领取 XP */
+async function claimReadXp() {
+  if (xpClaimed.value || !currentArticle.value) return
+  xpClaimed.value = true
+  try {
+    const readRes = await recordRead(articleId.value)
+    if (readRes.code === 0 && readRes.data) {
+      xpGained.value = readRes.data.xpGained
+      markAsRead(articleId.value)
+      await userStore.refreshUserData()
+    }
+  } catch {
+    console.warn('阅读记录上报失败')
+  }
+}
 
 onMounted(async () => {
-  // 始终调用详情接口获取完整内容（含 content 字段）
+  // 从 API 获取完整文章内容（含 content 字段）
   try {
     const res = await fetchArticleById(articleId.value)
     if (res.code === 0 && res.data) {
@@ -215,25 +256,35 @@ onMounted(async () => {
       } else {
         articleStore.articles.push(res.data)
       }
+      loadError.value = false
+    } else {
+      loadError.value = true
     }
   } catch {
-    console.warn('文章详情加载失败，使用已有数据')
+    loadError.value = true
+    console.warn('文章详情加载失败')
+  } finally {
+    articleLoading.value = false
   }
 
-  progressInterval = window.setInterval(() => {
-    if (readProgress.value < 100) {
-      readProgress.value += Math.random() * 5
-      if (readProgress.value > 100) {
-        readProgress.value = 100
-        if (progressInterval) clearInterval(progressInterval)
-      }
-    }
-  }, 1000)
+  // 监听滚动位置 → 计算真实阅读进度
+  const handleScroll = () => {
+    if (xpClaimed.value) return
+    const scrollTop = window.scrollY
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight
+    if (docHeight <= 0) return
+    const progress = Math.min(100, Math.round((scrollTop / docHeight) * 100))
+    readProgress.value = progress
+    if (progress >= 90) claimReadXp()
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  handleScroll()
 })
 
 onUnmounted(() => {
-  if (progressInterval) {
-    clearInterval(progressInterval)
-  }
+  // scroll listener 会在组件销毁时一并被移除
 })
 </script>
+
+

@@ -63,10 +63,7 @@
             v-for="(result, index) in searchResults" 
             :key="result.id"
             class="block mb-4 rounded-lg overflow-hidden transition-all duration-160 cursor-pointer"
-            :style="{
-              background: 'var(--color-bg-card)',
-              border: '1px solid var(--color-border-subtle)'
-            }"
+            :style="searchResultCardStyle"
             @mouseenter="handleCardHover($event, result.category)"
             @mouseleave="handleCardLeave($event)"
             @click="router.push(`/article/${result.id}`)"
@@ -102,7 +99,7 @@
         <!-- Sidebar -->
         <aside class="hidden lg:block">
           <!-- Search Suggestions -->
-          <div class="rounded-lg p-5 mb-6" style="background: var(--color-bg-card); border: 1px solid var(--color-border);">
+          <div class="rounded-lg p-5 mb-6" :style="sidebarPanelStyle">
             <div class="flex items-center gap-2 mb-4">
               <Sparkles class="w-4 h-4" style="color: var(--color-primary);" />
               <h3 class="text-sm font-semibold tracking-wide" style="font-family: var(--font-display); color: var(--color-text-primary);">{{ $t('search.sidebar.suggestions') }}</h3>
@@ -126,7 +123,7 @@
           </div>
 
           <!-- Trending Searches -->
-          <div class="rounded-lg p-5" style="background: var(--color-bg-card); border: 1px solid var(--color-border);">
+          <div class="rounded-lg p-5" :style="sidebarPanelStyle">
             <div class="flex items-center gap-2 mb-4">
               <TrendingUp class="w-4 h-4" style="color: var(--color-secondary);" />
               <h3 class="text-sm font-semibold tracking-wide" style="font-family: var(--font-display); color: var(--color-text-primary);">{{ $t('search.sidebar.hotSearches') }}</h3>
@@ -164,14 +161,19 @@ import { useArticleStore } from '@/stores/articleStore'
 import { Search, Clock, Layers, ArrowUpDown, ChevronDown, Sparkles, TrendingUp, ArrowUpRight } from 'lucide-vue-next'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
+import { useCardStyles } from '@/hooks/useCardStyles'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const themeStore = useThemeStore()
 const articleStore = useArticleStore()
+const { getCardStyle } = useCardStyles()
 
 const searchQuery = ref((route.query.q as string) || '')
+
+const searchResultCardStyle = computed(() => getCardStyle('article', false))
+const sidebarPanelStyle = computed(() => getCardStyle('panel', false))
 
 watch(() => route.query.q, (newQ) => {
   searchQuery.value = (newQ as string) || ''

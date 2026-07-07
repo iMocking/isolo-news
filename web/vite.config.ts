@@ -6,6 +6,8 @@ import traeBadgePlugin from 'vite-plugin-trae-solo-badge'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // .env 文件位于项目根目录（与 web/ 平级）
+  envDir: '..',
   plugins: [
     vue(),
     Inspector(),

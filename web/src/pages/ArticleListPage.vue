@@ -8,8 +8,8 @@
     <!-- Page Header -->
     <section class="pt-24 pb-6 px-6">
       <div class="max-w-7xl mx-auto">
-        <h1 class="text-2xl md:text-4xl tracking-wider" style="font-family: var(--font-display); color: var(--color-primary); word-break: keep-all;">任务列表 // MISSION SELECT</h1>
-        <p class="mt-3 text-sm" style="font-family: var(--font-mono); color: var(--color-text-secondary);">共 2,847 条情报</p>
+        <h1 class="text-2xl md:text-4xl tracking-wider" style="font-family: var(--font-display); color: var(--color-primary); word-break: keep-all;">{{ $t('articleList.title') }} // {{ $t('articleList.subtitle') }}</h1>
+        <p class="mt-3 text-sm" style="font-family: var(--font-mono); color: var(--color-text-secondary);">{{ $t('articleList.total', { count: articleStore.total }) }}</p>
         
         <!-- Search bar -->
         <div class="mt-5 max-w-xl relative">
@@ -18,7 +18,7 @@
             <input 
               type="text" 
               v-model="searchQuery"
-              placeholder="搜索情报关键词..." 
+              :placeholder="$t('articleList.searchPlaceholder')" 
               class="flex-1 bg-transparent outline-none text-sm" 
               style="color: var(--color-text-primary); font-family: var(--font-mono); caret-color: var(--color-primary);"
             />
@@ -48,7 +48,7 @@
           >
             {{ cat.name }} <span class="ml-1 text-xs" :style="{
               background: currentCategory === cat.id ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
-              color: currentCategory === cat.id ? 'var(--color-text-inverse)' : 'var(--color-text-tertiary)',
+              color: currentCategory === cat.id ? '#ffffff' : 'var(--color-text-tertiary)',
               padding: '1px 6px',
               borderRadius: 'var(--radius-full)'
             }">{{ cat.count }}</span>
@@ -62,74 +62,75 @@
       <div class="max-w-7xl mx-auto flex gap-6">
         <!-- Article List -->
         <div class="flex-1 min-w-0 space-y-3">
-          <article 
-            v-for="(article, index) in filteredArticles" 
-            :key="article.id"
-            class="flex items-stretch gap-0 p-5 transition-all duration-150 hover:translate-y-[-1px] cursor-pointer"
-            :style="{
-              background: 'var(--color-bg-card)',
-              border: '1px solid var(--color-border-subtle)',
-              borderLeft: `3px solid ${getCategoryColor(article.category)}`,
-              borderRadius: 'var(--radius-md)'
-            }"
-            @click="router.push(`/article/${article.id}`)"
-          >
-            <div class="shrink-0 w-12 flex items-center justify-center mr-5">
-              <span class="text-2xl font-bold" :style="{ fontFamily: 'var(--font-display)', color: getCategoryColor(article.category) }">
-                {{ String(index + 1).padStart(2, '0') }}
-              </span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-2">
+          <!-- 文章卡片循环 -->
+          <template v-if="articleStore.articles.length > 0">
+            <article 
+              v-for="(article, index) in articleStore.articles" 
+              :key="article.id"
+              class="flex items-stretch gap-0 p-5 transition-all duration-150 hover:translate-y-[-1px] cursor-pointer"
+              :style="{
+                ...articleCardStyle,
+                borderLeft: `3px solid ${getCategoryColor(article.category)}`
+              }"
+              @click="router.push(`/article/${article.id}`)"
+            >
+              <div class="shrink-0 w-12 flex items-center justify-center mr-5">
+                <span class="text-2xl font-bold" :style="{ fontFamily: 'var(--font-display)', color: getCategoryColor(article.category) }">
+                  {{ String(index + 1).padStart(2, '0') }}
+                </span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2">
                 <span class="px-2 py-0.5 text-xs font-medium whitespace-nowrap" :style="{
                   background: getCategoryBg(article.category),
                   color: getCategoryColor(article.category),
                   borderRadius: 'var(--radius-sm)',
                   fontFamily: 'var(--font-mono)'
                 }">{{ getCategoryName(article.category) }}</span>
+                <!-- 已读角标 -->
+                <span v-if="isRead(article.id)" class="shrink-0 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap" style="background: var(--color-primary); color: white; border-radius: var(--radius-sm); font-family: var(--font-mono);">已读</span>
                 <h2 class="text-base font-semibold truncate" style="color: var(--color-text-primary);">{{ article.title }}</h2>
-              </div>
-              <p class="text-sm line-clamp-2 mb-3" style="color: var(--color-text-secondary); line-height: 1.6;">{{ article.summary }}</p>
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 flex items-center justify-center" style="background: var(--color-bg-elevated); border-radius: var(--radius-full);">
-                  <span class="text-[10px] font-bold" :style="{ color: getCategoryColor(article.category) }">{{ article.author.charAt(0).toUpperCase() }}</span>
                 </div>
-                <span class="text-xs" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">{{ article.author }} · {{ formatTime(article.publishDate) }} · {{ article.commentCount || 0 }} 评论</span>
+                <p class="text-sm line-clamp-2 mb-3" style="color: var(--color-text-secondary); line-height: 1.6;">{{ article.summary }}</p>
+                <div class="flex items-center gap-3">
+                  <div class="w-5 h-5 flex items-center justify-center" style="background: var(--color-bg-elevated); border-radius: var(--radius-full);">
+                    <span class="text-[10px] font-bold" :style="{ color: getCategoryColor(article.category) }">{{ article.author.charAt(0).toUpperCase() }}</span>
+                  </div>
+                  <span class="text-xs" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">{{ article.author }} · {{ formatTime(article.publishDate) }} · {{ $t('articleList.comments', { count: article.commentCount || 0 }) }}</span>
+                </div>
               </div>
-            </div>
-            <div class="shrink-0 ml-5 flex flex-col items-center gap-3 justify-center">
-              <div class="px-3 py-1.5 text-xs font-bold whitespace-nowrap" :style="{
-                background: getCategoryBg(article.category),
-                border: `1px solid ${getCategoryBgLight(article.category)}`,
-                color: getCategoryColor(article.category),
-                borderRadius: 'var(--radius-sm)',
-                fontFamily: 'var(--font-display)'
-              }">+{{ article.xpReward }} XP</div>
-              <div class="flex gap-1">
-                <span v-for="i in 5" :key="i" class="w-2 h-2" :style="{
-                  background: i <= Math.min(5, Math.floor(article.xpReward / 100)) ? getCategoryColor(article.category) : 'var(--color-bg-elevated)',
-                  borderRadius: 'var(--radius-full)'
-                }"></span>
+              <div class="shrink-0 ml-5 flex flex-col items-center gap-3 justify-center">
+                <div class="px-3 py-1.5 text-xs font-bold whitespace-nowrap" :style="{
+                  background: getCategoryBg(article.category),
+                  border: `1px solid ${getCategoryBgLight(article.category)}`,
+                  color: getCategoryColor(article.category),
+                  borderRadius: 'var(--radius-sm)',
+                  fontFamily: 'var(--font-display)'
+                }">+{{ article.xpReward }} XP</div>
+                <div class="flex gap-1">
+                  <span v-for="i in 5" :key="i" class="w-2 h-2" :style="{
+                    background: i <= Math.min(5, Math.floor(article.xpReward / 100)) ? getCategoryColor(article.category) : 'var(--color-bg-elevated)',
+                    borderRadius: 'var(--radius-full)'
+                  }"></span>
+                </div>
+                <button class="px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-all duration-150 hover:opacity-80" :style="{
+                  background: getCategoryColor(article.category),
+                  color: 'var(--color-text-inverse)',
+                  borderRadius: 'var(--radius-sm)',
+                  fontFamily: 'var(--font-mono)'
+                }">{{ $t('articleList.startMission') }}</button>
               </div>
-              <button class="px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-all duration-150 hover:opacity-80" :style="{
-                background: getCategoryColor(article.category),
-                color: 'var(--color-text-inverse)',
-                borderRadius: 'var(--radius-sm)',
-                fontFamily: 'var(--font-mono)'
-              }">开始任务</button>
-            </div>
-          </article>
+            </article>
+          </template>
 
-          <!-- Pagination -->
-          <div class="flex items-center justify-center gap-2 pt-6">
-            <button class="px-3 py-2 text-xs font-medium whitespace-nowrap transition-all duration-150" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); color: var(--color-text-tertiary); border-radius: var(--radius-sm); font-family: var(--font-mono);">PREV</button>
-            <button class="w-9 h-9 flex items-center justify-center text-sm font-medium whitespace-nowrap" style="background: var(--color-primary); color: var(--color-text-inverse); border-radius: var(--radius-sm); font-family: var(--font-display);">1</button>
-            <button class="w-9 h-9 flex items-center justify-center text-sm font-medium whitespace-nowrap transition-all duration-150" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); color: var(--color-text-secondary); border-radius: var(--radius-sm); font-family: var(--font-mono);">2</button>
-            <button class="w-9 h-9 flex items-center justify-center text-sm font-medium whitespace-nowrap transition-all duration-150" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); color: var(--color-text-secondary); border-radius: var(--radius-sm); font-family: var(--font-mono);">3</button>
-            <span class="text-sm px-1" style="color: var(--color-text-tertiary); font-family: var(--font-mono);">...</span>
-            <button class="w-9 h-9 flex items-center justify-center text-sm font-medium whitespace-nowrap transition-all duration-150" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); color: var(--color-text-secondary); border-radius: var(--radius-sm); font-family: var(--font-mono);">42</button>
-            <button class="px-4 py-2 text-xs font-medium whitespace-nowrap transition-all duration-150" style="background: var(--color-primary-50); border: 1px solid var(--color-primary); color: var(--color-primary); border-radius: var(--radius-sm); font-family: var(--font-display);">NEXT STAGE →</button>
-          </div>
+          <!-- 空数据/离线提示 -->
+          <EmptyState
+            v-else-if="!articleStore.loading"
+            :type="articleStore.apiOffline ? 'offline' : (searchQuery ? 'search-empty' : 'empty')"
+          />
+
+          <!-- 分页组件（含每页条数选择） -->
+          <ListPagination />
         </div>
 
         <ArticleFilterSidebar 
@@ -147,8 +148,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '@/stores/themeStore'
 import { useArticleStore } from '@/stores/articleStore'
 import { fetchHotTags, fetchTrendingTopics } from '@/api/articles'
@@ -156,13 +158,73 @@ import { fetchLeaderboard } from '@/api/user'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import ArticleFilterSidebar from '@/components/business/ArticleFilterSidebar.vue'
+import { useCardStyles } from '@/hooks/useCardStyles'
+import ListPagination from '@/components/business/ListPagination.vue'
+import EmptyState from '@/components/base/EmptyState.vue'
+import { useReadTracker } from '@/composables/useReadTracker'
 
 const router = useRouter()
 const themeStore = useThemeStore()
 const articleStore = useArticleStore()
+const { getCardStyle } = useCardStyles()
+const { t } = useI18n()
 
 const searchQuery = ref('')
 const currentCategory = ref<string>('all')
+
+/** ======== 状态持久化：从 sessionStorage 恢复 ======== */
+const LIST_STATE_KEY = 'article_list_state'
+function restoreListState() {
+  try {
+    const saved = sessionStorage.getItem(LIST_STATE_KEY)
+    if (!saved) return
+    const state = JSON.parse(saved)
+    if (state.category) currentCategory.value = state.category
+    if (state.search) searchQuery.value = state.search
+    if (state.page) articleStore.currentPage = state.page
+    if (state.pageSize) articleStore.pageSize = state.pageSize
+  } catch { /* ignore */ }
+}
+restoreListState()
+
+/** 保存当前筛选条件 + 分页状态到 sessionStorage */
+function saveListState() {
+  try {
+    sessionStorage.setItem(LIST_STATE_KEY, JSON.stringify({
+      category: currentCategory.value,
+      search: searchQuery.value,
+      page: articleStore.currentPage,
+      pageSize: articleStore.pageSize,
+    }))
+  } catch { /* ignore */ }
+}
+
+/** 监听分页变化自动持久化 */
+watch(() => articleStore.currentPage, saveListState)
+watch(() => articleStore.pageSize, saveListState)
+
+/** ======== 分类切换 → 重新从 API 加载 ======== */
+watch(currentCategory, (cat) => {
+  articleStore.currentCategory = cat
+  articleStore.currentPage = 1
+  saveListState()
+  articleStore.loadArticles({ category: cat === 'all' ? undefined : cat, page: 1 })
+})
+
+/** ======== 搜索输入（防抖 400ms）→ 重新从 API 加载 ======== */
+let searchTimer: ReturnType<typeof setTimeout> | undefined
+watch(searchQuery, (q) => {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    articleStore.currentPage = 1
+    articleStore.searchQuery = q
+    saveListState()
+    articleStore.loadArticles({ search: q || undefined, page: 1 })
+  }, 400)
+})
+
+const { isRead } = useReadTracker()
+const articleCardStyle = computed(() => getCardStyle('article', false))
 
 /** 格式化时间戳 */
 const formatTime = (ts: number | string): string => {
@@ -170,16 +232,19 @@ const formatTime = (ts: number | string): string => {
   if (typeof ts === 'string') return ts
   const now = Date.now() / 1000
   const diff = now - ts
-  if (diff < 3600) return `${Math.floor(diff / 60)}分钟前`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}小时前`
-  if (diff < 2592000) return `${Math.floor(diff / 86400)}天前`
+  if (diff < 60) return t('common.justNow')
+  if (diff < 3600) return t('common.minutes', { count: Math.floor(diff / 60) })
+  if (diff < 86400) return t('common.hours', { count: Math.floor(diff / 3600) })
+  if (diff < 2592000) return t('common.days', { count: Math.floor(diff / 86400) })
   return new Date(ts * 1000).toLocaleDateString()
 }
 
-/** 从 store 获取分类列表 */
+/** 从 store 获取分类列表（去重「全部」） */
 const categories = computed(() => {
-  const cats = articleStore.categories.map(c => ({ id: c.id, name: c.name, count: c.count }))
-  return [{ id: 'all', name: '全部', count: articleStore.total || 0 }, ...cats]
+  const cats = articleStore.categories
+    .filter(c => c.id !== 'all')
+    .map(c => ({ id: c.id, name: c.name, count: c.count }))
+  return [{ id: 'all', name: t('articleList.categories.all'), count: articleStore.total || 0 }, ...cats]
 })
 
 const hotTags = ref<Array<{ name: string; bg: string; border: string; color: string }>>([])
@@ -192,6 +257,12 @@ const defaultTagStyles = {
 }
 
 onMounted(async () => {
+  // 进入页面时用恢复的状态加载文章
+  articleStore.currentCategory = currentCategory.value
+  articleStore.loadArticles({ page: articleStore.currentPage, page_size: articleStore.pageSize })
+  // 刷新分类列表（含实时计数）
+  articleStore.loadCategories()
+
   // 加载热门标签
   try {
     const res = await fetchHotTags()
@@ -214,22 +285,6 @@ onMounted(async () => {
   } catch {
     leaderboard.value = []
   }
-})
-
-/** 从 store 获取文章列表（自动分页过滤） */
-const articles = computed(() => articleStore.articles)
-
-const filteredArticles = computed(() => {
-  return articles.value.filter(article => {
-    const catSlug = typeof article.category === 'string' ? article.category : (article.category?.slug || '')
-    const matchesCategory = currentCategory.value === 'all' || catSlug === currentCategory.value
-    const title = article.title || ''
-    const summary = article.summary || ''
-    const matchesSearch = !searchQuery.value ||
-      title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      summary.toLowerCase().includes(searchQuery.value.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
 })
 
 /** 获取分类 slug */

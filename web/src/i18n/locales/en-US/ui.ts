@@ -13,7 +13,26 @@ export default {
     loading: 'Loading...',
     noData: 'No Data',
     back: 'Back',
-    search: 'Search'
+    search: 'Search',
+    minutes: '{count} minutes ago',
+    hours: '{count} hours ago',
+    days: '{count} days ago',
+    justNow: 'Just now',
+    errors: {
+      networkError: 'Network error, please try again later.'
+    },
+    empty: {
+      title: 'No Data',
+      description: 'Nothing to display right now'
+    },
+    offline: {
+      title: 'System Offline',
+      description: 'Unable to connect to the intel server. Some features may be unavailable.'
+    },
+    searchEmpty: {
+      title: 'No Results Found',
+      description: 'Try searching with different keywords'
+    }
   },
 
   // ==================== Navigation ====================
@@ -22,7 +41,13 @@ export default {
     tech: 'Tech',
     game: 'Gaming',
     hardware: 'Hardware',
-    anime: 'Anime'
+    anime: 'Anime',
+    intelligenceCenter: 'Intel Center',
+    intelligenceWarehouse: 'Intel Warehouse',
+    aboutMe: 'About Me',
+    profile: 'Profile',
+    settings: 'Settings',
+    logout: 'Log Out'
   },
 
   // ==================== Hero Section ====================

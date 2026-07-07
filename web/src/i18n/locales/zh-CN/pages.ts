@@ -10,8 +10,13 @@ export default {
     total: '共 {count} 条情报',
     searchPlaceholder: '搜索情报关键词...',
     startMission: '开始任务',
+    comments: '{count} 条评论',
     prev: 'PREV',
     next: 'NEXT STAGE →',
+    pagination: {
+      perPage: '每页',
+      unit: '条',
+    },
     filter: {
       title: '筛选条件',
       timeRange: '时间范围',
@@ -50,6 +55,7 @@ export default {
       current: '任务详情'
     },
     reading: '阅读 {count}',
+    readTime: '{count} 分钟阅读',
     xpProgress: 'XP 奖励进度',
     readProgress: '阅读进度 {progress}%',
     readReward: '读完可获得 +{xp} XP',
@@ -66,11 +72,18 @@ export default {
       like: '+{count} 点赞',
       favorited: '已收藏',
       favorite: '收藏',
-      share: '分享'
+      share: '分享',
+      loginRequired: '请先登录后再发表评论',
+      postSuccess: '评论发表成功',
+      postFail: '评论发表失败，请稍后重试'
     },
     sidebar: {
       related: '相关任务',
       interactions: '互动区',
+      comment: '评论',
+      like: '点赞',
+      favorite: '收藏',
+      share: '分享',
       xpOverview: 'XP 总览',
       xpThisArticle: '本篇奖励',
       xpToday: '今日已获',
@@ -140,11 +153,19 @@ export default {
     },
     profileEdit: {
       title: '个人信息编辑',
-      desc: '修改头像、昵称、签名'
+      desc: '修改头像、昵称、签名',
+      nickname: '昵称',
+      fieldTitle: '头衔',
+      tags: '标签（逗号分隔）',
+      saveSuccess: '保存成功',
+      saveFail: '保存失败'
     },
     theme: {
       title: '主题切换',
-      label: 'THEME'
+      label: 'THEME',
+      nexus: 'NEXUS 赛博朋克',
+      comiket: 'COMIKET 清新动漫',
+      ironcore: 'IRONCORE 硬核机甲'
     },
     privacy: {
       title: '隐私设置',
@@ -153,6 +174,18 @@ export default {
     security: {
       title: '账户安全',
       desc: '密码修改、登录验证'
+    },
+    system: {
+      title: '系统偏好',
+      info: '系统信息',
+      clientVersion: '客户端版本',
+      locale: '语言环境',
+      dataSync: '数据同步',
+      connected: '已连接',
+      localCache: '本地缓存',
+      compactMode: '紧凑模式',
+      reduceAnimation: '减少动画',
+      highContrast: '高对比度'
     }
   },
 
@@ -181,7 +214,20 @@ export default {
     divider: '快速接入',
     backHome: '返回首页',
     statusOnline: 'SYS.STATUS: ONLINE',
-    connSecure: 'CONN: SECURE'
+    connSecure: 'CONN: SECURE',
+    errors: {
+      emptyEmailPassword: '请输入邮箱和密码',
+      loginFail: '登录失败，请检查邮箱和密码',
+      emptyEmail: '请先输入邮箱',
+      sendCodeFail: '验证码发送失败',
+      fillAllFields: '请填写所有注册字段',
+      passwordMismatch: '两次输入的密码不一致',
+      passwordTooShort: '密码长度不能少于6位',
+      enterCode: '请先获取邮箱验证码并填写',
+      codeError: '验证码错误或已过期',
+      registerFail: '注册失败',
+      registerSuccess: '注册成功，请使用注册的邮箱登录'
+    }
   },
 
   // ==================== 关于页 ====================

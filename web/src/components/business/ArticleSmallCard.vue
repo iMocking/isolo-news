@@ -1,6 +1,6 @@
 <template>
   <article
-    class="rounded-lg p-4 transition-all duration-160 cursor-pointer"
+    class="p-4 transition-all duration-160 cursor-pointer"
     :style="cardStyle"
     @mouseenter="$emit('hover', article)"
     @mouseleave="$emit('leave', article)"
@@ -13,6 +13,8 @@
           <span class="px-1.5 py-0.5 rounded text-[9px] font-bold" :style="categoryTagStyle">
             {{ categoryName }}
           </span>
+          <!-- 已读角标 -->
+          <span v-if="isRead(article.id)" class="shrink-0 px-1 py-0.5 text-[9px] font-bold whitespace-nowrap" style="background: var(--color-primary); color: white; border-radius: var(--radius-sm); font-family: var(--font-mono);">已读</span>
         </div>
         <h4 class="text-sm font-semibold mb-1 truncate" :style="titleStyle">
           {{ article.title }}
@@ -32,17 +34,23 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { ArticleVO } from '@/api/articles'
+import { useCardStyles } from '@/hooks/useCardStyles'
+import { useReadTracker } from '@/composables/useReadTracker'
 
 const props = defineProps<{
   article: ArticleVO
   isHovered: boolean
 }>()
 
+const { isRead } = useReadTracker()
+
 defineEmits<{
   hover: [article: ArticleVO]
   leave: [article: ArticleVO]
   click: [id: string]
 }>()
+
+const { getCardStyle } = useCardStyles()
 
 const getCatSlug = (cat: any): string => typeof cat === 'string' ? cat : cat?.slug || ''
 
@@ -60,10 +68,9 @@ const formatTime = (ts: number | string): string => {
 const slug = computed(() => getCatSlug(props.article.category))
 const categoryName = computed(() => typeof props.article.category === 'string' ? props.article.category : props.article.category?.name || '')
 
-const cardStyle = computed(() => ({
-  background: 'var(--color-bgCard)',
-  border: props.isHovered ? '1px solid var(--color-border)' : '1px solid var(--color-borderSubtle)'
-}))
+const cardStyle = computed(() => {
+  return getCardStyle('default', props.isHovered)
+})
 
 const dotStyle = computed(() => {
   const colors: Record<string, string> = {

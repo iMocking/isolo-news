@@ -10,8 +10,13 @@ export default {
     total: '{count} intel reports',
     searchPlaceholder: 'Search intel keywords...',
     startMission: 'Start Mission',
+    comments: '{count} comments',
     prev: 'PREV',
     next: 'NEXT STAGE →',
+    pagination: {
+      perPage: 'Show',
+      unit: 'per page',
+    },
     filter: {
       title: 'Filters',
       timeRange: 'Time Range',
@@ -50,6 +55,7 @@ export default {
       current: 'Mission Detail'
     },
     reading: 'Read {count}',
+    readTime: '{count} min read',
     xpProgress: 'XP Progress',
     readProgress: 'Reading {progress}%',
     readReward: 'Finish for +{xp} XP',
@@ -66,11 +72,18 @@ export default {
       like: '+{count} likes',
       favorited: 'Saved',
       favorite: 'Save',
-      share: 'Share'
+      share: 'Share',
+      loginRequired: 'Please log in to comment.',
+      postSuccess: 'Comment posted!',
+      postFail: 'Failed to post comment. Please try again.'
     },
     sidebar: {
       related: 'Related Missions',
       interactions: 'Interactions',
+      comment: 'Comment',
+      like: 'Like',
+      favorite: 'Favorite',
+      share: 'Share',
       xpOverview: 'XP Overview',
       xpThisArticle: 'This Article',
       xpToday: 'Today Earned',
@@ -123,7 +136,7 @@ export default {
       ironcore: 'Iron Agent'
     },
     playerTitle: {
-      nexus: 'Cyber先锋 // Intel Hunter',
+      nexus: 'Cyber Pioneer // Intel Hunter',
       comiket: 'Manga Master // Tech Lover',
       ironcore: 'Intel Expert // Field Veteran'
     }
@@ -140,11 +153,19 @@ export default {
     },
     profileEdit: {
       title: 'Edit Profile',
-      desc: 'Change avatar, nickname, bio'
+      desc: 'Change avatar, nickname, bio',
+      nickname: 'Nickname',
+      fieldTitle: 'Title',
+      tags: 'Tags (comma separated)',
+      saveSuccess: 'Saved successfully',
+      saveFail: 'Save failed'
     },
     theme: {
       title: 'Theme',
-      label: 'THEME'
+      label: 'THEME',
+      nexus: 'NEXUS Cyberpunk',
+      comiket: 'COMIKET Anime',
+      ironcore: 'IRONCORE Mecha'
     },
     privacy: {
       title: 'Privacy',
@@ -153,6 +174,18 @@ export default {
     security: {
       title: 'Security',
       desc: 'Password & authentication'
+    },
+    system: {
+      title: 'Preferences',
+      info: 'System Info',
+      clientVersion: 'Client Version',
+      locale: 'Language',
+      dataSync: 'Data Sync',
+      connected: 'Connected',
+      localCache: 'Local Cache',
+      compactMode: 'Compact Mode',
+      reduceAnimation: 'Reduce Animation',
+      highContrast: 'High Contrast'
     }
   },
 
@@ -181,13 +214,26 @@ export default {
     divider: 'Quick Access',
     backHome: 'Back to Home',
     statusOnline: 'SYS.STATUS: ONLINE',
-    connSecure: 'CONN: SECURE'
+    connSecure: 'CONN: SECURE',
+    errors: {
+      emptyEmailPassword: 'Please enter email and password',
+      loginFail: 'Login failed. Please check your email and password.',
+      emptyEmail: 'Please enter your email first',
+      sendCodeFail: 'Failed to send verification code',
+      fillAllFields: 'Please fill in all registration fields',
+      passwordMismatch: 'Passwords do not match',
+      passwordTooShort: 'Password must be at least 6 characters',
+      enterCode: 'Please get a verification code first',
+      codeError: 'Code is invalid or expired',
+      registerFail: 'Registration failed',
+      registerSuccess: 'Registration successful! Please log in with your email.'
+    }
   },
 
   // ==================== About ====================
   about: {
     subtitle: '// About System',
-    intro: 'NEXUS DAILY is a cyberpunk-themed tech & anime intel platform, blending tech news, game reviews, hardware评测, and anime culture for an immersive reading experience.',
+    intro: 'NEXUS DAILY is a cyberpunk-themed tech & anime intel platform, blending tech news, game reviews, hardware analysis, and anime culture for an immersive reading experience.',
     sections: {
       platform: 'Platform',
       team: 'Team',

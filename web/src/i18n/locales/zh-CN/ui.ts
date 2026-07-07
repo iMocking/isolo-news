@@ -1,6 +1,6 @@
 /**
  * 中文 UI 文本语言包 — 通用/导航/首页
- * 按功能域组织，仅包含界面文字（不含文章 mock 数据）
+ * 按功能域组织，仅包含界面文字
  */
 export default {
   // ==================== 通用 ====================
@@ -13,7 +13,26 @@ export default {
     loading: '加载中...',
     noData: '暂无数据',
     back: '返回',
-    search: '搜索'
+    search: '搜索',
+    minutes: '{count} 分钟前',
+    hours: '{count} 小时前',
+    days: '{count} 天前',
+    justNow: '刚刚',
+    errors: {
+      networkError: '网络错误，请稍后再试'
+    },
+    empty: {
+      title: '暂无数据',
+      description: '当前没有可显示的内容'
+    },
+    offline: {
+      title: '情报系统离线',
+      description: '无法连接到情报服务器，部分功能可能不可用'
+    },
+    searchEmpty: {
+      title: '未找到结果',
+      description: '尝试使用其他关键词搜索'
+    }
   },
 
   // ==================== 导航 ====================
@@ -22,7 +41,13 @@ export default {
     tech: '科技资讯',
     game: '游戏情报',
     hardware: '硬件评测',
-    anime: '二次元'
+    anime: '二次元',
+    intelligenceCenter: '情报中心',
+    intelligenceWarehouse: '情报仓库',
+    aboutMe: '关于我',
+    profile: '个人中心',
+    settings: '偏好设置',
+    logout: '退出账号'
   },
 
   // ==================== 首页 Hero ====================

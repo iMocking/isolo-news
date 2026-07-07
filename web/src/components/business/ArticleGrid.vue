@@ -49,9 +49,13 @@
               </div>
             </div>
             <div class="p-5">
-              <h3 class="text-base font-semibold mb-2 truncate" :style="cardTitleStyle">
-                {{ article.title }}
-              </h3>
+              <div class="flex items-center gap-2 mb-2">
+                <!-- 已读角标 -->
+                <span v-if="isRead(article.id)" class="shrink-0 px-1.5 py-0.5 text-[10px] font-bold whitespace-nowrap" style="background: var(--color-primary); color: white; border-radius: var(--radius-sm); font-family: var(--font-mono);">已读</span>
+                <h3 class="text-base font-semibold truncate" :style="cardTitleStyle">
+                  {{ article.title }}
+                </h3>
+              </div>
               <p class="text-sm mb-3 line-clamp-2" :style="cardSummaryStyle">
                 {{ article.summary }}
               </p>
@@ -73,6 +77,13 @@
             @click="handleArticleClick"
           />
         </div>
+
+        <!-- 空数据提示 -->
+        <EmptyState
+          v-if="articles.length === 0"
+          :type="emptyType || 'empty'"
+          class="col-span-2"
+        />
       </div>
 
       <!-- Sidebar (固定 280px，不收缩) -->
@@ -90,9 +101,14 @@ import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '@/stores/themeStore'
 import type { ArticleVO } from '@/api/articles'
 import ArticleSmallCard from './ArticleSmallCard.vue'
+import { useCardStyles } from '@/hooks/useCardStyles'
+import EmptyState from '@/components/base/EmptyState.vue'
+import { useReadTracker } from '@/composables/useReadTracker'
 
 interface Props {
   articles: ArticleVO[]
+  /** 空状态类型，articles 为空时显示 */
+  emptyType?: 'empty' | 'offline' | 'search-empty'
 }
 
 const getCategoryName = (cat: any): string =>
@@ -116,6 +132,9 @@ const { t } = useI18n()
 const props = defineProps<Props>()
 const router = useRouter()
 const themeStore = useThemeStore()
+const { getCardStyle } = useCardStyles()
+
+const { isRead } = useReadTracker()
 
 const handleArticleClick = (articleId: string) => {
   router.push(`/article/${articleId}`)
@@ -142,10 +161,8 @@ const headerTagStyle = computed(() => ({ fontFamily: 'var(--font-mono)', color: 
 const largeCardStyle = computed(() => (article: ArticleVO) => {
   const isHovered = hoveredCards.value.has(article.id)
   return {
-    background: 'var(--color-bgCard)',
-    border: isHovered ? '1px solid var(--color-primary)' : '1px solid var(--color-borderSubtle)',
-    gridColumn: 'span 1',
-    boxShadow: isHovered ? '0 0 20px rgba(0, 240, 255, 0.08)' : 'none'
+    ...getCardStyle('article', isHovered),
+    gridColumn: 'span 1'
   }
 })
 

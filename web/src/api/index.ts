@@ -5,7 +5,8 @@
 
 import axios, { type AxiosInstance, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 
-const API_BASE = '/api/v1'
+/** API 基础路径，优先从环境变量读取 */
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 
 /** API 统一响应格式 */
 export interface ApiResponse<T = unknown> {
@@ -26,7 +27,7 @@ export interface PaginatedData<T> {
 /** 创建 axios 实例 */
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE,
-  timeout: 15000,
+  timeout: 8000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -79,6 +80,15 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
+/**
+ * 构建降级错误响应（网络/超时错误时返回，不抛异常）
+ */
+function buildErrorResponse(message: string): { data: ApiResponse<null> } {
+  return {
+    data: { code: -1, message, data: null },
+  }
+}
+
 /** 响应拦截器：统一处理错误码 + 自动刷新 Token */
 apiClient.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
@@ -129,23 +139,25 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // 其他错误处理
-    if (error.response) {
-      const { status } = error.response
-      switch (status) {
-        case 403:
-          console.error('权限不足')
-          break
-        case 500:
-          console.error('服务器内部错误')
-          break
-      }
-    } else if (error.code === 'ECONNABORTED') {
-      console.error('请求超时')
-    } else {
-      console.error('网络错误')
+    // === 以下所有错误均返回降级响应，绝不抛异常 ===
+    // 因此所有调用方无需 try/catch 也能安全消费
+
+    // 超时
+    if (error.code === 'ECONNABORTED') {
+      console.warn(`[API] 请求超时: ${originalRequest.url}`)
+      return buildErrorResponse('请求超时，请检查网络连接')
     }
-    return Promise.reject(error)
+
+    // 无响应（网络断开等）
+    if (!error.response) {
+      console.warn(`[API] 网络不可用: ${originalRequest.url}`)
+      return buildErrorResponse('网络连接失败，请检查网络')
+    }
+
+    // 其他 HTTP 错误（403/500 等）
+    const { status } = error.response
+    console.warn(`[API] HTTP ${status}: ${originalRequest.url}`)
+    return buildErrorResponse(`服务器错误 (${status})`)
   }
 )
 

@@ -1,7 +1,7 @@
 <template>
   <aside class="lg:col-span-1 space-y-8">
     <!-- Related Missions -->
-    <div class="p-5" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md);">
+    <div class="p-5" :style="sidebarPanelStyle">
       <h3 class="text-sm font-semibold mb-4 pb-3 whitespace-nowrap" style="color: var(--color-text-primary); font-family: var(--font-display); letter-spacing: 0.02em; border-bottom: 1px solid var(--color-border-subtle);">相关任务</h3>
       <div class="space-y-4">
         <a v-for="(item, index) in relatedArticles" :key="index" href="#" class="block group">
@@ -18,74 +18,54 @@
       </div>
     </div>
 
-    <!-- Interaction Area -->
-    <div class="p-5" style="background: var(--color-bg-card); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md);">
+    <!-- Interaction Area — 横排纵向布局 -->
+    <div class="p-5" :style="sidebarPanelStyle">
       <h3 class="text-sm font-semibold mb-4 pb-3 whitespace-nowrap" style="color: var(--color-text-primary); font-family: var(--font-display); letter-spacing: 0.02em; border-bottom: 1px solid var(--color-border-subtle);">互动区</h3>
-      <div class="space-y-3">
-        <!-- Comment count -->
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <MessageCircle class="w-4 h-4" style="color: var(--color-text-tertiary);" />
-            <span class="text-sm whitespace-nowrap" style="color: var(--color-text-secondary);">{{ commentCount }} 条评论</span>
-          </div>
-        </div>
-        <!-- Like button -->
-        <button 
-          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all duration-150"
-          :style="{
-            background: isLiked ? 'var(--color-primary)' : 'var(--color-primary-50)',
-            color: isLiked ? 'white' : 'var(--color-primary)',
-            border: '1px solid var(--color-border)'
-          }"
-          @mouseenter="($event.target as HTMLElement).style.background = isLiked ? 'var(--color-primary-dark)' : 'var(--color-primary-100)'"
-          @mouseleave="($event.target as HTMLElement).style.background = isLiked ? 'var(--color-primary)' : 'var(--color-primary-50)'"
-          @click="handleLike"
-        >
-          <Heart class="w-4 h-4" :fill="isLiked ? 'currentColor' : 'none'" />
-          <span>{{ isLiked ? '已点赞' : `+${likeCount} 点赞` }}</span>
+      <div class="grid grid-cols-4 gap-2">
+        <!-- 评论 -->
+        <button class="flex flex-col items-center gap-1.5 py-3 px-1 rounded-lg transition-all duration-150 cursor-default" :style="interactionCardStyle">
+          <MessageCircle class="w-[18px] h-[18px]" style="color: var(--color-text-tertiary);" />
+          <span class="text-[11px] whitespace-nowrap" style="color: var(--color-text-secondary);">{{ $t('articleDetail.sidebar.comment') }}</span>
+          <span class="text-xs font-bold" style="color: var(--color-text-primary); font-family: var(--font-mono);">{{ commentCount }}</span>
         </button>
-        <!-- Favorite button -->
-        <button 
-          class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all duration-150"
-          :style="{
-            background: isFavorited ? 'var(--state-warning)' : 'var(--color-bg-elevated)',
-            color: isFavorited ? 'white' : 'var(--color-text-secondary)',
-            border: '1px solid var(--color-border-subtle)'
-          }"
-          @mouseenter="($event.target as HTMLElement).style.background = isFavorited ? '#e6a700' : 'var(--color-bg-tertiary)'"
-          @mouseleave="($event.target as HTMLElement).style.background = isFavorited ? 'var(--state-warning)' : 'var(--color-bg-elevated)'"
-          @click="handleFavorite"
-        >
-          <Bookmark class="w-4 h-4" :fill="isFavorited ? 'currentColor' : 'none'" />
-          <span>{{ isFavorited ? '已收藏' : '收藏' }}</span>
+        <!-- 点赞 -->
+        <button class="flex flex-col items-center gap-1.5 py-3 px-1 rounded-lg transition-all duration-150" :style="likeButtonStyle" @click="handleLike">
+          <Heart class="w-[18px] h-[18px]" :fill="isLiked ? 'currentColor' : 'none'" :style="{ color: isLiked ? 'white' : 'var(--color-text-tertiary)' }" />
+          <span class="text-[11px] whitespace-nowrap" :style="{ color: isLiked ? 'white' : 'var(--color-text-secondary)' }">{{ $t('articleDetail.sidebar.like') }}</span>
+          <span class="text-xs font-bold" :style="{ color: isLiked ? 'white' : 'var(--color-text-primary)', fontFamily: 'var(--font-mono)' }">{{ likeCount }}</span>
         </button>
-        <!-- Share button -->
-        <button class="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all duration-150" style="background: var(--color-bg-elevated); color: var(--color-text-secondary); border: 1px solid var(--color-border-subtle);" @mouseenter="($event.target as HTMLElement).style.background = 'var(--color-bg-tertiary)'" @mouseleave="($event.target as HTMLElement).style.background = 'var(--color-bg-elevated)'">
-          <Share2 class="w-4 h-4" />
-          <span>分享</span>
+        <!-- 收藏 -->
+        <button class="flex flex-col items-center gap-1.5 py-3 px-1 rounded-lg transition-all duration-150" :style="favButtonStyle" @click="handleFavorite">
+          <Bookmark class="w-[18px] h-[18px]" :fill="isFavorited ? 'currentColor' : 'none'" :style="{ color: isFavorited ? 'white' : 'var(--color-text-tertiary)' }" />
+          <span class="text-[11px] whitespace-nowrap" :style="{ color: isFavorited ? 'white' : 'var(--color-text-secondary)' }">{{ $t('articleDetail.sidebar.favorite') }}</span>
+        </button>
+        <!-- 分享 -->
+        <button class="flex flex-col items-center gap-1.5 py-3 px-1 rounded-lg transition-all duration-150" :style="shareButtonStyle" @click="handleShare">
+          <Share2 class="w-[18px] h-[18px]" style="color: var(--color-text-tertiary);" />
+          <span class="text-[11px] whitespace-nowrap" style="color: var(--color-text-secondary);">{{ $t('articleDetail.sidebar.share') }}</span>
         </button>
       </div>
     </div>
 
-    <!-- XP Summary -->
-    <div class="p-5" style="background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+    <!-- XP Summary — 数据来自 userStore -->
+    <div class="p-5" :style="xpPanelStyle">
       <h3 class="text-sm font-semibold mb-4 pb-3 whitespace-nowrap" style="color: var(--color-primary); font-family: var(--font-display); letter-spacing: 0.02em; border-bottom: 1px solid var(--color-border-subtle);">XP 总览</h3>
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">本篇奖励</span>
-          <span class="text-sm font-semibold whitespace-nowrap" style="color: var(--color-primary); font-family: var(--font-display);">+500 XP</span>
+          <span class="text-sm font-semibold whitespace-nowrap" style="color: var(--color-primary); font-family: var(--font-display);">+{{ currentArticle.xpReward || 0 }} XP</span>
         </div>
         <div class="flex items-center justify-between">
-          <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">今日已获</span>
-          <span class="text-sm font-semibold whitespace-nowrap" style="color: var(--color-state-success); font-family: var(--font-display);">+1,200 XP</span>
+          <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">当前等级</span>
+          <span class="text-sm font-semibold whitespace-nowrap" style="color: var(--color-state-success); font-family: var(--font-display);">LV.{{ userStore.level }}</span>
         </div>
         <div class="pt-2" style="border-top: 1px solid var(--color-border-subtle);">
           <div class="flex items-center justify-between mb-1">
-            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">距离 LV.13</span>
-            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">800 / 2,000 XP</span>
+            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">距离 LV.{{ userStore.level + 1 }}</span>
+            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">{{ userStore.xp }} / {{ userStore.maxXp }} XP</span>
           </div>
           <div class="w-full h-2 rounded-full overflow-hidden" style="background: var(--color-bg-tertiary);">
-            <div class="h-full rounded-full" style="width: 40%; background: linear-gradient(90deg, var(--color-primary), var(--color-primaryLight));"></div>
+            <div class="h-full rounded-full" :style="{ width: `${xpProgressPercent}%`, background: 'linear-gradient(90deg, var(--color-primary), var(--color-primaryLight))' }"></div>
           </div>
         </div>
       </div>
@@ -94,10 +74,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { Heart, Share2, MessageCircle, Bookmark } from 'lucide-vue-next'
 import { toggleLike, toggleFavorite as toggleFavoriteApi } from '@/api/articles'
+import { useCardStyles } from '@/hooks/useCardStyles'
 
 const props = defineProps<{
   articleId: string
@@ -106,12 +87,44 @@ const props = defineProps<{
 }>()
 
 const userStore = useUserStore()
+const { getCardStyle } = useCardStyles()
 
 const isLiked = ref(false)
 const likeCount = ref(0)
 const isFavorited = ref(false)
 
 const relatedArticles = ref<Array<{ title: string; time: string }>>([])
+
+const sidebarPanelStyle = computed(() => getCardStyle('panel', false))
+const xpPanelStyle = computed(() => getCardStyle('elevated', false))
+
+/** 互动卡片基础样式 */
+const interactionCardStyle = computed(() => ({
+  background: 'var(--color-bg-elevated)',
+  border: '1px solid var(--color-border-subtle)',
+}))
+
+const likeButtonStyle = computed(() => ({
+  background: isLiked.value ? 'var(--color-primary)' : 'var(--color-bg-elevated)',
+  border: `1px solid ${isLiked.value ? 'var(--color-primary)' : 'var(--color-border-subtle)'}`,
+  color: isLiked.value ? 'white' : 'var(--color-text-secondary)',
+}))
+
+const favButtonStyle = computed(() => ({
+  background: isFavorited.value ? 'var(--state-warning)' : 'var(--color-bg-elevated)',
+  border: `1px solid ${isFavorited.value ? 'var(--state-warning)' : 'var(--color-border-subtle)'}`,
+  color: isFavorited.value ? 'white' : 'var(--color-text-secondary)',
+}))
+
+const shareButtonStyle = computed(() => ({
+  background: 'var(--color-bg-elevated)',
+  border: '1px solid var(--color-border-subtle)',
+}))
+
+/** XP 进度百分比（防止除以 0） */
+const xpProgressPercent = computed(() =>
+  userStore.maxXp > 0 ? Math.min(100, Math.round((userStore.xp / userStore.maxXp) * 100)) : 0
+)
 
 const handleLike = async () => {
   if (!userStore.isLoggedIn) return
@@ -136,6 +149,26 @@ const handleFavorite = async () => {
     }
   } catch {
     console.warn('收藏操作失败')
+  }
+}
+
+/** 分享功能（优先使用 Web Share API） */
+const handleShare = async () => {
+  const url = window.location.href
+  const title = props.currentArticle?.title || ''
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, url })
+    } catch {
+      // 用户取消分享不视为错误
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(url)
+      // 可考虑使用 toast 提示
+    } catch {
+      console.warn('复制链接失败')
+    }
   }
 }
 </script>
