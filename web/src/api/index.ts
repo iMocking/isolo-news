@@ -63,8 +63,8 @@ function clearAuth() {
   localStorage.removeItem('access_token')
   localStorage.removeItem('refresh_token')
   // 使用 window.location 跳转确保完全重置
-  if (window.location.pathname !== '/login') {
-    window.location.href = '/login'
+  if (window.location.pathname !== '/auth/login') {
+    window.location.href = '/auth/login'
   }
 }
 

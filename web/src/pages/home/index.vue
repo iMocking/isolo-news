@@ -1,9 +1,6 @@
 <template>
   <!-- overflow-x-hidden 防止任何元素超出视口导致水平滚动条 -->
   <div class="min-h-screen overflow-x-hidden">
-    <!-- Navigation（fixed 定位，脱离文档流） -->
-    <AppNavigation />
-
     <!-- Main Content（pt-16 为固定导航栏让出 64px 空间） -->
     <main class="pt-16">
       <!-- Hero Section -->
@@ -23,8 +20,6 @@
       <DailyQuests />
     </main>
 
-    <!-- Footer -->
-    <AppFooter />
   </div>
 </template>
 
@@ -32,8 +27,6 @@
 import { computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { useArticleStore } from '@/stores/articleStore'
-import AppNavigation from '@/components/layout/AppNavigation.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
 import HeroSection from './HeroSection.vue'
 import TrendingTopics from './TrendingTopics.vue'
 import ArticleGrid from '@/components/business/ArticleGrid.vue'

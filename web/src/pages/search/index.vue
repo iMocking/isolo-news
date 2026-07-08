@@ -3,8 +3,6 @@
     <!-- Scanline overlay -->
     <div v-if="themeStore.currentTheme === 'nexus'" class="fixed inset-0 pointer-events-none z-40 opacity-[0.03]" style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.08) 2px, rgba(255, 255, 255, 0.08) 4px);"></div>
 
-    <AppNavigation />
-
     <!-- Search Header -->
     <section class="relative pt-24 pb-8" style="background: var(--color-bg-primary);">
       <div class="max-w-7xl mx-auto px-6">
@@ -148,7 +146,6 @@
       </div>
     </section>
 
-    <AppFooter />
   </div>
 </template>
 
@@ -159,8 +156,6 @@ import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '@/stores/themeStore'
 import { useArticleStore } from '@/stores/articleStore'
 import { Search, Clock, Layers, ArrowUpDown, ChevronDown, Sparkles, TrendingUp, ArrowUpRight } from 'lucide-vue-next'
-import AppNavigation from '@/components/layout/AppNavigation.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
 import { useCardStyles } from '@/hooks/useCardStyles'
 
 const { t } = useI18n()

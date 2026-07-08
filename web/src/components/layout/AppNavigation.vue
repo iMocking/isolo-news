@@ -194,7 +194,7 @@ const logoutMouseLeave = (e: any) => {
 
 const handleAvatarClick = () => {
   if (!userStore.isLoggedIn) {
-    router.push({ path: '/login', query: { redirect: router.currentRoute.value.fullPath } })
+    router.push({ path: '/auth/login', query: { redirect: router.currentRoute.value.fullPath } })
   }
 }
 

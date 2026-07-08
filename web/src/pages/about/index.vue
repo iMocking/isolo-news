@@ -3,8 +3,6 @@ import { onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Twitter, Github, Mail, Cpu, Users, Layers, MessageCircle } from 'lucide-vue-next'
 import BaseCard from '@/components/base/BaseCard.vue'
-import AppNavigation from '@/components/layout/AppNavigation.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
 import { useThemeStore } from '@/stores/themeStore'
 import { useCardStyles } from '@/hooks/useCardStyles'
 
@@ -45,8 +43,6 @@ const platformFeatures = computed(() => {
 
 <template>
   <div class="min-h-screen" :style="{ background: 'var(--color-bgPrimary)' }">
-    <AppNavigation />
-
     <!-- About Content -->
     <main class="max-w-5xl mx-auto px-6 pt-24 pb-16">
       <!-- Header -->
@@ -173,7 +169,5 @@ const platformFeatures = computed(() => {
         </div>
       </BaseCard>
     </main>
-
-    <AppFooter />
   </div>
 </template>

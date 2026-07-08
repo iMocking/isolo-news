@@ -1,16 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import { useUserStore } from '@/stores/userStore'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
+    component: () => import('@/layouts/MainLayout.vue'),
+    redirect: { name: 'Home' },
+    children: [
+      // ==================== 首页 ====================
+       {
+    path: '/home',
     name: 'Home',
     component: () => import('@/pages/home/index.vue')
   },
   // ==================== 文章路由（嵌套布局） ====================
   {
-    path: '/article',
+    path: 'article',
+    name: 'Article',
     component: () => import('@/layouts/ArticleLayout.vue'),
     children: [
       {
@@ -29,10 +35,9 @@ const routes: RouteRecordRaw[] = [
       }
     ]
   },
-
   // ==================== 认证路由（嵌套布局） ====================
   {
-    path: '/auth',
+    path: 'auth',
     component: () => import('@/layouts/AuthLayout.vue'),
     children: [
       {
@@ -51,38 +56,41 @@ const routes: RouteRecordRaw[] = [
       }
     ]
   },
-
   // ==================== 其他页面 ====================
   {
-    path: '/search',
+    path: 'search',
     name: 'SearchResults',
     component: () => import('@/pages/search/index.vue')
   },
   {
-    path: '/profile',
+    path: 'profile',
     name: 'UserProfile',
     meta: { requiresAuth: true },
     component: () => import('@/pages/profile/index.vue')
   },
   {
-    path: '/about',
+    path: 'about',
     name: 'About',
     component: () => import('@/pages/about/index.vue')
   },
   {
-    path: '/settings',
+    path: 'settings',
     name: 'Settings',
     meta: { requiresAuth: true },
     component: () => import('@/pages/settings/index.vue')
   },
   {
-    path: '/404',
+    path: '404',
     name: 'NotFound',
     component: () => import('@/pages/404.vue')
   },
+    ]
+  },
+ 
+  // 通配路由放在根层级，确保在所有子路由之后匹配
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/404'
+    redirect: { name: 'NotFound' }
   }
 ]
 

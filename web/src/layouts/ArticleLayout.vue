@@ -1,12 +1,5 @@
 <template>
-  <div class="min-h-screen" :style="{ background: 'var(--color-bgPrimary)' }">
-    <AppNavigation />
+  <div :style="{ background: 'var(--color-bgPrimary)', minHeight: '100vh' }">
     <router-view />
-    <AppFooter />
   </div>
 </template>
-
-<script setup lang="ts">
-import AppNavigation from '@/components/layout/AppNavigation.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
-</script>

@@ -6,8 +6,6 @@ import SystemInfoCard from '@/pages/profile/SystemInfoCard.vue'
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BaseCard from '@/components/base/BaseCard.vue'
-import AppNavigation from '@/components/layout/AppNavigation.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
 import { useThemeStore } from '@/stores/themeStore'
 import { useUserStore } from '@/stores/userStore'
 import { useCardStyles } from '@/hooks/useCardStyles'
@@ -63,8 +61,6 @@ const systemInfo = [
 
 <template>
   <div class="min-h-screen" :style="{ background: 'var(--color-bgPrimary)' }">
-    <AppNavigation />
-
     <main class="max-w-3xl mx-auto px-6 pt-24 pb-16">
       <!-- Header -->
       <section class="relative overflow-hidden rounded-2xl mb-10 p-8" :style="getCardStyle('panel', false)">
@@ -234,6 +230,5 @@ const systemInfo = [
         <SystemInfoCard :items="systemInfo" />
       </div>
     </main>
-    <AppFooter />
   </div>
 </template>

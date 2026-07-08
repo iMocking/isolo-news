@@ -5,8 +5,6 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useArticleStore } from '@/stores/articleStore'
 import BaseProgressBar from '@/components/base/BaseProgressBar.vue'
-import AppNavigation from '@/components/layout/AppNavigation.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
 import HeroSection from './HeroSection.vue'
 import StatsPanel from './StatsPanel.vue'
 import AchievementGrid from './AchievementGrid.vue'
@@ -85,8 +83,6 @@ const handleLogout = () => {
 
 <template>
   <div class="min-h-screen" :style="{ background: 'var(--color-bgPrimary)' }">
-    <AppNavigation />
-
     <main class="pt-16">
       <!-- 用户头像与信息 -->
       <HeroSection />
@@ -132,8 +128,6 @@ const handleLogout = () => {
         </button>
       </section>
     </main>
-
-    <AppFooter />
   </div>
 </template>
 
