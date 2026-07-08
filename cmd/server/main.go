@@ -31,7 +31,7 @@ func main() {
 	ctx := context.Background()
 
 	// 加载配置（默认读取 configs/config.yaml，也支持 .env 覆盖）
-	configPath := "configs/config.yaml"
+	configPath := "config.yaml"
 	if envPath := os.Getenv("ISOLO_CONFIG"); envPath != "" {
 		configPath = envPath
 	}
